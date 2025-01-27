@@ -47,6 +47,20 @@ components:
         - dateTime
         - foods
 
+    Symptoms:
+      type: object
+      properties:
+        symptoms:
+          type: string
+          description: List of symptoms experienced
+        dateTime:
+          type: string
+          format: date-time
+          description: The date and time of the symptoms
+      required:
+        - symptoms
+        - dateTime
+
 paths:
   # This may be handled by Cognito
   /users:
@@ -258,7 +272,7 @@ paths:
         400:
           description: Invalid input
 
-  /foods/suggested:
+  /foods/suggested/{mealType}:
     get:
       summary: Get suggested foods
       description: Retrieves a list of suggested foods for the user's next meals, categorized by meal type
@@ -329,23 +343,39 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                symptoms:
-                  type: string
-                  description: List of symptoms experienced
-                dateTime:
-                  type: string
-                  format: date-time
-                  description: The date and time of the symptoms
-              required:
-                - symptoms
-                - dateTime
+              $ref: "#/components/schemas/Symptoms"
       responses:
         201:
           description: Symptoms logged successfully
         400:
           description: Invalid input
+
+  /symptoms/history:
+    get:
+      summary: View symptom history
+      description: Allows users to view their symptom entries in reverse chronological order.
+      parameters:
+        - in: query
+          name: days
+          schema:
+            type: integer
+            description: Number of days of history to retrieve (default 3)
+          required: false
+        - in: query
+          name: offset
+          schema:
+            type: integer
+            description: Days the query is offset by, for pagination
+          required: false
+      responses:
+        200:
+          description: List of past symptoms
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Symptoms"
 
   /notifications/reminders:
     post:

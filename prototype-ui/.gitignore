@@ -1,0 +1,29 @@
+# Node modules
+node_modules/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Vite cache
+.vite/
+
+# Local environment variables
+.env.local
+.env.*.local
+
+# Tailwind CSS generated files
+tailwind.config.js
+tailwind.config.cjs
+postcss.config.js
+
+# Build output
+dist/
+
+# IDE specific files
+.vscode/
+.idea/
+
+# Mac specific files
+.DS_Store

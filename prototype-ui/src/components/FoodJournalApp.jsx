@@ -71,37 +71,6 @@ const FoodJournalApp = () => {
     },
   ]);
 
-  const [selectedFoods, setSelectedFoods] = useState([]);
-  const [inputValue, setInputValue] = useState("");
-
-  const suggestions = [
-    { type: "Yesterday", items: ["Oatmeal", "Coffee", "Banana"] },
-    {
-      type: "Recent Meals",
-      items: ["Grilled Chicken", "Rice", "Turkey Sandwich"],
-    },
-    { type: "Common Foods", items: ["Coffee", "Water", "Apple"] },
-  ];
-
-  const defaultTimeForMeal = (mealType) => {
-    switch (mealType) {
-      case "Breakfast":
-        return "08:00";
-      case "Lunch":
-        return "12:30";
-      case "Dinner":
-        return "18:30";
-      default:
-        return "10:00";
-    }
-  };
-
-  const getNextMealInSequence = (mealType) => {
-    const sequence = ["Breakfast", "Lunch", "Dinner"];
-    const currentIndex = sequence.indexOf(mealType);
-    return sequence[(currentIndex + 1) % sequence.length];
-  };
-
   const getNextMealFromHistory = () => {
     if (meals.length === 0)
       return {
@@ -128,6 +97,10 @@ const FoodJournalApp = () => {
       return moment(`${date} ${time}`, "YYYY-MM-DD HH:mm").toISOString();
     };
 
+    console.log(
+      `Latest meal: ${latestMainMeal.type} ${latestMainMeal.date} ${latestMainMeal.time}`
+    );
+
     const latestMoment = moment(
       `${latestMainMeal.date} ${latestMainMeal.time}`,
       "YYYY-MM-DD HH:mm"
@@ -153,7 +126,39 @@ const FoodJournalApp = () => {
     };
   };
 
-  const nextMeal = getNextMealFromHistory();
+  const getNextMealInSequence = (mealType) => {
+    const sequence = ["Breakfast", "Lunch", "Dinner"];
+    const currentIndex = sequence.indexOf(mealType);
+    return sequence[(currentIndex + 1) % sequence.length];
+  };
+
+  const defaultTimeForMeal = (mealType) => {
+    switch (mealType) {
+      case "Breakfast":
+        return "08:00";
+      case "Lunch":
+        return "12:30";
+      case "Dinner":
+        return "18:30";
+      default:
+        return "10:00";
+    }
+  };
+
+  const [nextMeal, setNextMeal] = useState(getNextMealFromHistory());
+
+  const [selectedFoods, setSelectedFoods] = useState([]);
+  const [inputValue, setInputValue] = useState("");
+
+  const suggestions = [
+    { type: "Yesterday", items: ["Oatmeal", "Coffee", "Banana"] },
+    {
+      type: "Recent Meals",
+      items: ["Grilled Chicken", "Rice", "Turkey Sandwich"],
+    },
+    { type: "Common Foods", items: ["Coffee", "Water", "Apple"] },
+  ];
+
   const currentMealType = nextMeal.type;
   const currentColors = mealColors[currentMealType];
 
@@ -170,17 +175,15 @@ const FoodJournalApp = () => {
   const handleMealSubmit = (e) => {
     console.log("Recording meal");
 
-    const now = moment();
-    const m = {
+    const newMeal = {
       id: Math.max(...meals.map((em) => em.id)) + 1,
-      date: now.format("YYYY-MM-DD"),
-      time: now.format("HH:mm"),
-      type: currentMealType,
-      foods: [...selectedFoods],
+      foods: selectedFoods,
+      ...nextMeal,
     };
-    setSelectedFoods([]);
 
-    setMeals([m, ...meals]);
+    setMeals([newMeal, ...meals]);
+    setNextMeal(getNextMealFromHistory());
+    setSelectedFoods([]);
   };
 
   return (

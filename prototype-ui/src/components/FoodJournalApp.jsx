@@ -82,14 +82,70 @@ const FoodJournalApp = () => {
     { type: "Common Foods", items: ["Coffee", "Water", "Apple"] },
   ];
 
-  const nextMealType = () => {
-    const hour = new Date().getHours();
-    if (hour < 11) return "Breakfast";
-    if (hour < 15) return "Lunch";
-    return "Dinner";
+  const defaultTimeForMeal = (mealType) => {
+    switch (mealType) {
+      case "Breakfast":
+        return "08:00";
+      case "Lunch":
+        return "12:30";
+      case "Dinner":
+        return "18:30";
+      default:
+        return "10:00";
+    }
   };
 
-  const currentMealType = nextMealType();
+  const getNextMealInSequence = (mealType) => {
+    const sequence = ["Breakfast", "Lunch", "Dinner"];
+    const currentIndex = sequence.indexOf(mealType);
+    return sequence[(currentIndex + 1) % sequence.length];
+  };
+
+  const getNextMealFromHistory = () => {
+    if (meals.length === 0)
+      return {
+        type: "Breakfast",
+        date: new Date().toISOString().split("T")[0],
+        time: defaultTimeForMeal("Breakfast"),
+      };
+
+    // Find the latest main meal (excluding snacks)
+    const latestMainMeal = meals.find((meal) =>
+      ["Breakfast", "Lunch", "Dinner"].includes(meal.type)
+    );
+
+    if (!latestMainMeal) {
+      return {
+        type: "Breakfast",
+        date: new Date().toISOString().split("T")[0],
+        time: defaultTimeForMeal("Breakfast"),
+      };
+    }
+
+    const latestDate = latestMainMeal.date;
+    const latestType = latestMainMeal.type;
+
+    // If the latest meal was dinner, return breakfast for next day
+    if (latestType === "Dinner") {
+      const nextDate = new Date(latestDate);
+      nextDate.setDate(nextDate.getDate() + 1);
+      return {
+        type: "Breakfast",
+        date: nextDate.toISOString().split("T")[0],
+        time: defaultTimeForMeal("Breakfast"),
+      };
+    }
+
+    // Otherwise return next meal in sequence for same day
+    return {
+      type: getNextMealInSequence(latestType),
+      date: latestDate,
+      time: defaultTimeForMeal(getNextMealInSequence(latestType)),
+    };
+  };
+
+  const nextMeal = getNextMealFromHistory();
+  const currentMealType = nextMeal.type;
   const currentColors = mealColors[currentMealType];
 
   const handleAddFood = (food) => {
@@ -105,10 +161,13 @@ const FoodJournalApp = () => {
   const handleMealSubmit = (e) => {
     console.log("Recording meal");
 
+    const now = new Date();
     const m = {
-      id: Math.max(meals.map((em) => em.id)) + 1,
-      date: "2025-01-04",
-      time: "08:00",
+      id: Math.max(...meals.map((em) => em.id)) + 1,
+      date: nextMeal.date,
+      time: `${String(now.getHours()).padStart(2, "0")}:${String(
+        now.getMinutes()
+      ).padStart(2, "0")}`,
       type: currentMealType,
       foods: [...selectedFoods],
     };
@@ -123,7 +182,12 @@ const FoodJournalApp = () => {
       <Card className={`border-2 ${currentColors.border}`}>
         <CardHeader className={`${currentColors.header} rounded-t-lg`}>
           <CardTitle className="flex items-center justify-between">
-            <span>Enter {currentMealType} for Sat 1/4/2025</span>
+            <span>
+              Enter {currentMealType} for{" "}
+              {new Date(
+                `${nextMeal.date} ${nextMeal.time}`
+              ).toLocaleDateString()}
+            </span>
             <div className="space-x-2">
               <Button
                 variant="secondary"

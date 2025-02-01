@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import moment from "moment";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Calendar, Clock, Plus, SkipForward, ChevronDown } from "lucide-react";
@@ -105,7 +106,7 @@ const FoodJournalApp = () => {
     if (meals.length === 0)
       return {
         type: "Breakfast",
-        date: new Date().toISOString().split("T")[0],
+        date: moment().format("YYYY-MM-DD"),
         time: defaultTimeForMeal("Breakfast"),
       };
 
@@ -117,30 +118,38 @@ const FoodJournalApp = () => {
     if (!latestMainMeal) {
       return {
         type: "Breakfast",
-        date: new Date().toISOString().split("T")[0],
+        date: moment().format("YYYY-MM-DD"),
         time: defaultTimeForMeal("Breakfast"),
       };
     }
 
-    const latestDate = latestMainMeal.date;
+    // Utility function to get ISO format for backend
+    const getISODateTime = (date, time) => {
+      return moment(`${date} ${time}`, "YYYY-MM-DD HH:mm").toISOString();
+    };
+
+    const latestMoment = moment(
+      `${latestMainMeal.date} ${latestMainMeal.time}`,
+      "YYYY-MM-DD HH:mm"
+    );
     const latestType = latestMainMeal.type;
 
     // If the latest meal was dinner, return breakfast for next day
     if (latestType === "Dinner") {
-      const nextDate = new Date(latestDate);
-      nextDate.setDate(nextDate.getDate() + 1);
+      const nextDate = latestMoment.add(1, "days");
       return {
         type: "Breakfast",
-        date: nextDate.toISOString().split("T")[0],
+        date: nextDate.format("YYYY-MM-DD"),
         time: defaultTimeForMeal("Breakfast"),
       };
     }
 
     // Otherwise return next meal in sequence for same day
+    const nextType = getNextMealInSequence(latestType);
     return {
-      type: getNextMealInSequence(latestType),
-      date: latestDate,
-      time: defaultTimeForMeal(getNextMealInSequence(latestType)),
+      type: nextType,
+      date: latestMoment.format("YYYY-MM-DD"),
+      time: defaultTimeForMeal(nextType),
     };
   };
 
@@ -161,13 +170,11 @@ const FoodJournalApp = () => {
   const handleMealSubmit = (e) => {
     console.log("Recording meal");
 
-    const now = new Date();
+    const now = moment();
     const m = {
       id: Math.max(...meals.map((em) => em.id)) + 1,
-      date: nextMeal.date,
-      time: `${String(now.getHours()).padStart(2, "0")}:${String(
-        now.getMinutes()
-      ).padStart(2, "0")}`,
+      date: now.format("YYYY-MM-DD"),
+      time: now.format("HH:mm"),
       type: currentMealType,
       foods: [...selectedFoods],
     };
@@ -184,9 +191,10 @@ const FoodJournalApp = () => {
           <CardTitle className="flex items-center justify-between">
             <span>
               Enter {currentMealType} for{" "}
-              {new Date(
-                `${nextMeal.date} ${nextMeal.time}`
-              ).toLocaleDateString()}
+              {moment(
+                `${nextMeal.date} ${nextMeal.time}`,
+                "YYYY-MM-DD HH:mm"
+              ).format("ddd M/D/YY")}
             </span>
             <div className="space-x-2">
               <Button
@@ -298,10 +306,12 @@ const FoodJournalApp = () => {
                     <div className="flex items-center space-x-2">
                       <Calendar className={`w-4 h-4 ${colors.text}`} />
                       <span className={`font-medium ${colors.text}`}>
-                        {meal.date}
+                        {moment(meal.date, "YYYY-MM-DD").format("ddd M/D/YY")}
                       </span>
                       <Clock className={`w-4 h-4 ${colors.text} ml-2`} />
-                      <span className={colors.text}>{meal.time}</span>
+                      <span className={colors.text}>
+                        {moment(meal.time, "HH:mm").format("h:mm A")}
+                      </span>
                     </div>
                     <span
                       className={`${colors.header} px-3 py-1 rounded-full text-sm`}

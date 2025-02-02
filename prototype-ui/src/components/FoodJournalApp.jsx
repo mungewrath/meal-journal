@@ -225,7 +225,7 @@ const FoodJournalApp = () => {
         </CardHeader>
         <CardContent className={`${currentColors.bg}`}>
           {/* Selected Foods */}
-          <div className="flex flex-wrap gap-2 py-4">
+          <div className="flex flex-wrap gap-2 py-2">
             {selectedFoods.map((food, index) => (
               <div
                 key={index}
@@ -301,7 +301,7 @@ const FoodJournalApp = () => {
           <CardTitle>Meal History</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="space-y-4">
+          <div className="space-y-4 py-4">
             {meals.map((meal) => {
               const colors = mealColors[meal.type];
               return (

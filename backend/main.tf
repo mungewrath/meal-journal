@@ -54,13 +54,24 @@ resource "aws_api_gateway_resource" "preferences" {
 #   uri                     = aws_lambda_function.default_preferences.invoke_arn
 # }
 
+# Managed Cognito User Pool #
 resource "aws_cognito_user_pool" "mj_user_pool" {
   name = "mj_user_pool"
 }
 
-resource "aws_cognito_user_pool_client" "user_pool_client" {
+resource "aws_cognito_user_pool_client" "mj_user_pool_client" {
+  user_pool_id                         = aws_cognito_user_pool.mj_user_pool.id
+  name                                 = "user_pool_client"
+  allowed_oauth_flows_user_pool_client = true
+  allowed_oauth_flows                  = ["code"]
+  allowed_oauth_scopes                 = ["phone", "email", "openid", "profile"]
+  callback_urls                        = ["http://localhost:5173", "https://${aws_cloudfront_distribution.mj_distribution.domain_name}"]
+  supported_identity_providers         = ["COGNITO"]
+}
+
+resource "aws_cognito_user_pool_domain" "mj_user_pool_domain" {
+  domain       = "mj-user-pool-domain"
   user_pool_id = aws_cognito_user_pool.mj_user_pool.id
-  name         = "user_pool_client"
 }
 
 # resource "aws_api_gateway_authorizer" "cognito" {
@@ -93,12 +104,12 @@ resource "aws_iam_role_policy_attachment" "lambda_policy" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
 }
 
-# Static Website Hosting #
+# Cloudfront Website Hosting #
 resource "aws_s3_bucket" "mj_static_website" {
   bucket = "mbd-static-website"
-
 }
 
+# Upload all files in the dist folder as s3 objects
 locals {
   content_type_map = {
     "js"   = "text/javascript"
@@ -107,15 +118,6 @@ locals {
   }
 }
 
-# resource "aws_s3_object" "mj_vite_app" {
-#   bucket       = aws_s3_bucket.mj_static_website.bucket
-#   key          = "index.html"
-#   source       = "../prototype-ui/dist/index.html"
-#   acl          = "public-read"
-#   content_type = "text/html"
-# }
-
-# Upload all files in the dist folder as s3 objects
 resource "aws_s3_object" "mj_vite_app_files" {
   for_each = fileset("../prototype-ui/dist", "**")
 
@@ -124,55 +126,6 @@ resource "aws_s3_object" "mj_vite_app_files" {
   source       = "../prototype-ui/dist/${each.value}"
   acl          = "public-read"
   content_type = lookup(local.content_type_map, split(".", "../prototype-ui/dist/${each.value}")[3], "text/html")
-}
-
-resource "aws_s3_bucket_ownership_controls" "mj_pub_bucket_ownership" {
-  bucket = aws_s3_bucket.mj_static_website.id
-  rule {
-    object_ownership = "BucketOwnerPreferred"
-  }
-}
-
-resource "aws_s3_bucket_public_access_block" "mj_pub_block" {
-  bucket = aws_s3_bucket.mj_static_website.id
-
-  block_public_acls       = false
-  block_public_policy     = false
-  ignore_public_acls      = false
-  restrict_public_buckets = false
-}
-
-resource "aws_s3_bucket_acl" "mj_public_website_acl" {
-  depends_on = [
-    aws_s3_bucket_ownership_controls.mj_pub_bucket_ownership,
-    aws_s3_bucket_public_access_block.mj_pub_block,
-  ]
-
-  bucket = aws_s3_bucket.mj_static_website.id
-  acl    = "public-read"
-}
-
-resource "aws_s3_bucket_website_configuration" "mj_website_config" {
-  bucket = aws_s3_bucket.mj_static_website.id
-
-  index_document {
-    suffix = "index.html"
-  }
-
-  error_document {
-    key = "error.html"
-  }
-
-  routing_rules = <<EOF
-[{
-    "Condition": {
-        "KeyPrefixEquals": "docs/"
-    },
-    "Redirect": {
-        "ReplaceKeyPrefixWith": ""
-    }
-}]
-EOF
 }
 
 # Cloudfront Distribution

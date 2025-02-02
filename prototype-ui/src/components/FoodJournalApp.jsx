@@ -71,8 +71,8 @@ const FoodJournalApp = () => {
     },
   ]);
 
-  const getNextMealFromHistory = () => {
-    if (meals.length === 0)
+  const getNextMealFromHistory = (currentMeals = meals) => {
+    if (currentMeals.length === 0)
       return {
         type: "Breakfast",
         date: moment().format("YYYY-MM-DD"),
@@ -80,7 +80,7 @@ const FoodJournalApp = () => {
       };
 
     // Find the latest main meal (excluding snacks)
-    const latestMainMeal = meals.find((meal) =>
+    const latestMainMeal = currentMeals.find((meal) =>
       ["Breakfast", "Lunch", "Dinner"].includes(meal.type)
     );
 
@@ -181,8 +181,12 @@ const FoodJournalApp = () => {
       ...nextMeal,
     };
 
-    setMeals([newMeal, ...meals]);
-    setNextMeal(getNextMealFromHistory());
+    setMeals((prevMeals) => {
+      const updatedMeals = [newMeal, ...prevMeals];
+      const nextMealType = getNextMealFromHistory(updatedMeals);
+      setNextMeal(nextMealType);
+      return updatedMeals;
+    });
     setSelectedFoods([]);
   };
 

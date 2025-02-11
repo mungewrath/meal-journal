@@ -26,6 +26,8 @@ resource "aws_dynamodb_table" "mj_user_preferences" {
 #   source_code_hash = filebase64sha256("lambda.zip")
 # }
 
+
+# TODO: This is a duplicate. Current working API GW is in apigw.tf
 resource "aws_api_gateway_rest_api" "mj_api" {
   name        = "MealJournalAPI"
   description = "API Gateway for Meal Journal"

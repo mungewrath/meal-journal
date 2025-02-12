@@ -27,17 +27,12 @@ resource "aws_dynamodb_table" "mj_user_preferences" {
 # }
 
 
-# TODO: This is a duplicate. Current working API GW is in apigw.tf
-resource "aws_api_gateway_rest_api" "mj_api" {
-  name        = "MealJournalAPI"
-  description = "API Gateway for Meal Journal"
-}
 
-resource "aws_api_gateway_resource" "preferences" {
-  rest_api_id = aws_api_gateway_rest_api.mj_api.id
-  parent_id   = aws_api_gateway_rest_api.mj_api.root_resource_id
-  path_part   = "preferences"
-}
+# resource "aws_api_gateway_resource" "preferences" {
+#   rest_api_id = aws_api_gateway_rest_api.mj_api.id
+#   parent_id   = aws_api_gateway_rest_api.mj_api.root_resource_id
+#   path_part   = "preferences"
+# }
 
 # resource "aws_api_gateway_method" "get_preferences" {
 #   rest_api_id   = aws_api_gateway_rest_api.mj_api.id
@@ -75,14 +70,6 @@ resource "aws_cognito_user_pool_domain" "mj_user_pool_domain" {
   domain       = "mj-user-pool-domain"
   user_pool_id = aws_cognito_user_pool.mj_user_pool.id
 }
-
-# resource "aws_api_gateway_authorizer" "cognito" {
-#   name            = "cognito_authorizer"
-#   rest_api_id     = aws_api_gateway_rest_api.mj_api.id
-#   authorizer_uri  = "arn:aws:apigateway:${var.region}:cognito-idp:action/Authorize"
-#   identity_source = "method.request.header.Authorization"
-#   provider_arns   = [aws_cognito_user_pool.mj_user_pool.arn]
-# }
 
 resource "aws_iam_role" "lambda_exec" {
   name = "lambda_exec_role"

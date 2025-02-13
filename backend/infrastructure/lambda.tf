@@ -6,6 +6,11 @@
 #   source = "path-to-your-local-fastapi-app/fastapi-app.zip"  # Path to your zipped Lambda package
 # }
 
+
+variable "lambda_package_zip" {
+  default = "../api_lambda.zip"
+}
+
 # Lambda IAM Role
 resource "aws_iam_role" "lambda_role" {
   name = "mbd-api-lambda-role"
@@ -32,7 +37,7 @@ resource "aws_iam_policy_attachment" "lambda_basic_execution" {
 }
 
 resource "terraform_data" "lambda_upload_trigger" {
-  input = base64sha256(filebase64("package.zip"))
+  input = base64sha256(filebase64(var.lambda_package_zip))
 }
 
 # Lambda Function
@@ -44,7 +49,7 @@ resource "aws_lambda_function" "mbd_api_lambda_handler" {
   memory_size   = 256
   timeout       = 10
 
-  filename = "package.zip"
+  filename = var.lambda_package_zip
 
   lifecycle {
     replace_triggered_by = [terraform_data.lambda_upload_trigger]

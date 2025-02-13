@@ -1,0 +1,29 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "API:DEV",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "fastapi",
+      "cwd": "${workspaceFolder}/backend/app",
+      "args": ["dev"],
+      "justMyCode": false,
+      "env": {
+        "ENVIRONMENT": "dev"
+      }
+    }
+    // {
+    //   "name": "API:PROD",
+    //   "type": "debugpy",
+    //   "request": "launch",
+    //   "module": "fastapi",
+    //   "cwd": "${workspaceFolder}/backend/app",
+    //   "args": ["run"],
+    //   "justMyCode": false,
+    //   "env": {
+    //     "ENVIRONMENT": "prod"
+    //   }
+    // }
+  ]
+}

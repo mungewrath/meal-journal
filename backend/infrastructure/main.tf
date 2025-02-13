@@ -6,17 +6,6 @@ variable "region" {
   default = "us-west-2"
 }
 
-resource "aws_dynamodb_table" "mj_user_preferences" {
-  name         = "mj_user_preferences"
-  billing_mode = "PAY_PER_REQUEST"
-  hash_key     = "user_id"
-
-  attribute {
-    name = "user_id"
-    type = "S"
-  }
-}
-
 # resource "aws_lambda_function" "default_preferences" {
 #   filename         = "lambda.zip"
 #   function_name    = "default_preferences"
@@ -108,13 +97,13 @@ locals {
 }
 
 resource "aws_s3_object" "mj_vite_app_files" {
-  for_each = fileset("../prototype-ui/dist", "**")
+  for_each = fileset("../../prototype-ui/dist", "**")
 
   bucket       = aws_s3_bucket.mj_static_website.bucket
   key          = each.value
-  source       = "../prototype-ui/dist/${each.value}"
+  source       = "../../prototype-ui/dist/${each.value}"
   acl          = "public-read"
-  content_type = lookup(local.content_type_map, split(".", "../prototype-ui/dist/${each.value}")[3], "text/html")
+  content_type = lookup(local.content_type_map, split(".", "../../prototype-ui/dist/${each.value}")[3], "text/html")
 }
 
 # Cloudfront Distribution

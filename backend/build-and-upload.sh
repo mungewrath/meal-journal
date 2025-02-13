@@ -3,7 +3,7 @@
 # https://docs.astral.sh/uv/guides/integration/aws-lambda/#deploying-a-zip-archive
 
 SKIP_S3_UPLOAD=false
-ARCHIVE_NAME="package.zip"
+ARCHIVE_NAME="api_lambda.zip"
 S3_ZIP_NAME="mbd-api.zip"
 
 while getopts "sf" opt; do
@@ -27,7 +27,7 @@ while getopts "sf" opt; do
 done
 
 
-uv export --frozen --no-dev --no-editable -o requirements.txt
+uv export -q --frozen --no-dev --no-editable -o requirements.txt
 uv pip install \
    --no-installer-metadata \
    --no-compile-bytecode \
@@ -37,11 +37,11 @@ uv pip install \
    -r requirements.txt
 
 cd packages
-zip -r ../${ARCHIVE_NAME} .
+zip -qr ../${ARCHIVE_NAME} .
 cd ..
 
 cd app
-zip -r ../${ARCHIVE_NAME} .
+zip -qr ../${ARCHIVE_NAME} .
 cd ..
 
 if [ "$SKIP_S3_UPLOAD" = false ]; then

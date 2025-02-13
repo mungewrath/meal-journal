@@ -1,6 +1,6 @@
 # Local build artifacts
 packages/
-package.zip
+api_lambda.zip
 requirements.txt
 
 # Byte-compiled / optimized / DLL files

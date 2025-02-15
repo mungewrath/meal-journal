@@ -332,6 +332,8 @@ dependencies = [
     { name = "boto3" },
     { name = "fastapi" },
     { name = "mangum" },
+    { name = "pynamodb" },
+    { name = "python-dotenv" },
 ]
 
 [package.dev-dependencies]
@@ -344,6 +346,8 @@ requires-dist = [
     { name = "boto3", specifier = ">=1.36.19" },
     { name = "fastapi", specifier = ">=0.115.8" },
     { name = "mangum", specifier = ">=0.19.0" },
+    { name = "pynamodb", specifier = ">=5.5.1" },
+    { name = "python-dotenv", specifier = ">=1.0.1" },
 ]
 
 [package.metadata.requires-dev]
@@ -423,6 +427,18 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/7c/2d/c3338d48ea6cc0feb8446d8e6937e1408088a72a39937982cc6111d17f84/pygments-2.19.1.tar.gz", hash = "sha256:61c16d2a8576dc0649d9f39e089b5f02bcd27fba10d8fb4dcc28173f7a45151f", size = 4968581 }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/8a/0b/9fcc47d19c48b59121088dd6da2488a49d5f72dacf8262e2790a1d2c7d15/pygments-2.19.1-py3-none-any.whl", hash = "sha256:9ea1544ad55cecf4b8242fab6dd35a93bbce657034b0611ee383099054ab6d8c", size = 1225293 },
+]
+
+[[package]]
+name = "pynamodb"
+version = "6.0.2"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "botocore" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/cf/65/f630ff2f593a33de44825962dd05a2643f5e01a410ca335bcf8891fa9d09/pynamodb-6.0.2.tar.gz", hash = "sha256:a85ea1ee42d6cb53128ec910507406e7901532f605d28e2680016e25bcbd6828", size = 94837 }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/52/5c/3d806c8764c05f51d1a5bca8169dc45264666bec6b9106a8599f4c5cebcf/pynamodb-6.0.2-py3-none-any.whl", hash = "sha256:12befe0ed8132b6d77b9212c0af9c894977443ef826b60fe5ef185c2f2f4126b", size = 61189 },
 ]
 
 [[package]]

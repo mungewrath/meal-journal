@@ -1,17 +1,25 @@
+import json
 import logging
+import os
 from typing import Annotated
 
-from fastapi import FastAPI, HTTPException, Header, Request
+from fastapi import FastAPI, Header
 from mangum import Mangum
+from shared.auth import get_user_id
 import boto3
-from shared.auth import decode_jwt
+from botocore.exceptions import ClientError
+from preferences.preferences import MbdPreferences
+from dotenv import load_dotenv
+
+ENV = os.getenv("ENVIRONMENT")
+
+if ENV is not None:
+    load_dotenv(f".env.{ENV}")
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
 app = FastAPI(root_path="/api/v1")
-
-DB_NAME = "mj_user_preferences"
 
 # Used when API Gateway/lambda is deployed
 handler = Mangum(app, lifespan="off", api_gateway_base_path="/api/v1")
@@ -24,10 +32,12 @@ async def root() -> str:
 
 
 @app.get("/preferences")
-async def pref(authorization: Annotated[str | None, Header()] = None) -> str:
-    print(f"{authorization=}")
+async def pref(authorization: Annotated[str | None, Header()] = None) -> dict:
+    user_id = get_user_id(authorization)
 
-    d = decode_jwt(authorization.replace("Bearer ", ""))
-    user_id = d["payload"]["sub"]
+    try:
+        prefs = MbdPreferences.get(user_id)
+    except MbdPreferences.DoesNotExist:
+        prefs = MbdPreferences(user_id=user_id)
 
-    return f"Your ID is {user_id}"
+    return prefs.to_simple_dict()

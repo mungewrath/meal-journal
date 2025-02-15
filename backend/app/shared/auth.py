@@ -2,6 +2,11 @@ import base64
 import json
 
 
+def get_user_id(auth_token: str) -> str:
+    d = decode_jwt(auth_token.replace("Bearer ", ""))
+    return d["payload"]["sub"]
+
+
 def decode_base64_url(data: str) -> bytes:
     """
     Decodes Base64-URL encoded strings (used in JWT) to raw bytes.

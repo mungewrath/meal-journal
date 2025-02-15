@@ -36,6 +36,35 @@ resource "aws_iam_policy_attachment" "lambda_basic_execution" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
 }
 
+# Grant DynamoDB permissions
+resource "aws_iam_policy" "lambda_dynamodb_access" {
+  name        = "lambda_dynamodb_access"
+  description = "Allow Lambda to access DynamoDB"
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "dynamodb:PutItem",
+          "dynamodb:GetItem",
+          "dynamodb:UpdateItem",
+          "dynamodb:DeleteItem",
+          "dynamodb:Scan",
+          "dynamodb:Query"
+        ]
+        Resource = aws_dynamodb_table.mj_user_preferences.arn
+      },
+    ]
+  })
+}
+
+resource "aws_iam_policy_attachment" "lambda_dynamodb_access" {
+  name       = "lambda_dynamodb_access"
+  roles      = [aws_iam_role.lambda_role.name]
+  policy_arn = aws_iam_policy.lambda_dynamodb_access.arn
+}
+
 resource "terraform_data" "lambda_upload_trigger" {
   input = base64sha256(filebase64(var.lambda_package_zip))
 }
@@ -48,6 +77,12 @@ resource "aws_lambda_function" "mbd_api_lambda_handler" {
   runtime       = "python3.11"
   memory_size   = 256
   timeout       = 10
+
+  environment {
+    variables = {
+      PREFERENCES_DB_NAME = aws_dynamodb_table.mj_user_preferences.name
+    }
+  }
 
   filename = var.lambda_package_zip
 

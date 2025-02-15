@@ -1,7 +1,8 @@
 # Meal Journal backend
 
 ## Backend local setup
-`uv lock` - Installs packages
+`uv sync` - Installs packages
+`uv lock` - Updates uv.lock file for consistent dependencies
 
 ## Debugging Backend
 You should be able to use VS Code to debug with breakpoints.

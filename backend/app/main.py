@@ -1,13 +1,11 @@
-import json
 import logging
 import os
 from typing import Annotated
 
 from fastapi import FastAPI, Header
 from mangum import Mangum
+from dto.preferences_update import PreferencesUpdate
 from shared.auth import get_user_id
-import boto3
-from botocore.exceptions import ClientError
 from preferences.preferences import MbdPreferences
 from dotenv import load_dotenv
 
@@ -32,7 +30,9 @@ async def root() -> str:
 
 
 @app.get("/preferences")
-async def pref(authorization: Annotated[str | None, Header()] = None) -> dict:
+async def get_preferences(
+    authorization: Annotated[str | None, Header()] = None
+) -> dict:
     user_id = get_user_id(authorization)
 
     try:
@@ -40,4 +40,23 @@ async def pref(authorization: Annotated[str | None, Header()] = None) -> dict:
     except MbdPreferences.DoesNotExist:
         prefs = MbdPreferences(user_id=user_id)
 
-    return prefs.to_simple_dict()
+    return prefs.to_dto()
+
+
+@app.post("/preferences")
+async def update_preferences(
+    preferences: PreferencesUpdate,
+    authorization: Annotated[str | None, Header()] = None,
+) -> dict:
+    user_id = get_user_id(authorization)
+
+    try:
+        prefs = MbdPreferences.get(user_id)
+    except MbdPreferences.DoesNotExist:
+        prefs = MbdPreferences(user_id=user_id)
+
+    prefs.default_meal_times = preferences.defaultMealTimes
+    prefs.use_thumbnails = preferences.useThumbnails
+    prefs.save()
+
+    return prefs.to_dto()

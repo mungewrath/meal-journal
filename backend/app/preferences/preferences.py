@@ -21,3 +21,9 @@ class MbdPreferences(Model):
     user_id = UnicodeAttribute(hash_key=True)
     default_meal_times = ListAttribute(default=lambda: ["9:00", "12:00", "18:00"])
     use_thumbnails = BooleanAttribute(default=True)
+
+    def to_dto(self) -> dict:
+        return {
+            "defaultMealTimes": self.default_meal_times,
+            "useThumbnails": self.use_thumbnails,
+        }

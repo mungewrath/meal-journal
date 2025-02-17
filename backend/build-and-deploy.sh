@@ -2,14 +2,14 @@
 
 # https://docs.astral.sh/uv/guides/integration/aws-lambda/#deploying-a-zip-archive
 
-SKIP_S3_UPLOAD=false
+SKIP_DEPLOY=false
 ARCHIVE_NAME="api_lambda.zip"
 S3_ZIP_NAME="mbd-api.zip"
 
 while getopts "sf" opt; do
     case ${opt} in
         s )
-            SKIP_S3_UPLOAD=true
+            SKIP_DEPLOY=true
             ;;
         f )
             echo "Cleaning build..."
@@ -44,10 +44,10 @@ cd app
 zip -qr ../${ARCHIVE_NAME} .
 cd ..
 
-if [ "$SKIP_S3_UPLOAD" = false ]; then
-    # Add your S3 upload commands here
-    echo "Uploading to S3..."
-    aws s3 cp ${ARCHIVE_NAME} s3://mbd-lambda-deployments/${S3_ZIP_NAME}
+if [ "$SKIP_DEPLOY" = false ]; then
+    echo "Performing terraform deploy..."
+    cd infrastructure
+    terraform apply -auto-approve
 else
-    echo "Skipping S3 upload."
+    echo "Skipping terraform deploy."
 fi

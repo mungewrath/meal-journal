@@ -1,8 +1,11 @@
 import logging
 import os
 from typing import Annotated
+import uuid
+import traceback
 
-from fastapi import FastAPI, Header
+from fastapi import FastAPI, Header, Request
+from fastapi.responses import JSONResponse
 from mangum import Mangum
 from dto.preferences_update import PreferencesUpdate
 from shared.auth import get_user_id
@@ -21,6 +24,30 @@ app = FastAPI(root_path="/api/v1")
 
 # Used when API Gateway/lambda is deployed
 handler = Mangum(app, lifespan="off", api_gateway_base_path="/api/v1")
+
+
+# TODO: Generalize to open telemetry / ADOT
+@app.middleware("http")
+async def add_correlation_id(request: Request, call_next):
+    # Check if the client sent a correlation ID; otherwise generate one
+    correlation_id = request.headers.get("X-Correlation-ID", str(uuid.uuid4()))
+    # Store the correlation ID for downstream use (e.g., logging)
+    request.state.correlation_id = correlation_id
+
+    try:
+        response = await call_next(request)
+    except Exception as exc:
+        response = JSONResponse(
+            {
+                "detail": "An internal server error occurred. Please contact your belly's diary maintainers"
+            },
+            status_code=500,
+        )
+        logger.error("Exception occurred: %s", traceback.format_exc())
+        logger.error("[Correlation ID: %s]", correlation_id)
+
+    response.headers["X-Correlation-ID"] = correlation_id
+    return response
 
 
 @app.get("/")  # Needed for local system development

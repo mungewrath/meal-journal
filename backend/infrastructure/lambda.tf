@@ -65,18 +65,16 @@ resource "aws_iam_policy_attachment" "lambda_dynamodb_access" {
   policy_arn = aws_iam_policy.lambda_dynamodb_access.arn
 }
 
-resource "terraform_data" "lambda_upload_trigger" {
-  input = base64sha256(filebase64(var.lambda_package_zip))
-}
-
 # Lambda Function
 resource "aws_lambda_function" "mbd_api_lambda_handler" {
-  function_name = "mbd-api-lambda-handler"
-  role          = aws_iam_role.lambda_role.arn
-  handler       = "main.handler"
-  runtime       = "python3.11"
-  memory_size   = 256
-  timeout       = 10
+  function_name    = "mbd-api-lambda-handler"
+  role             = aws_iam_role.lambda_role.arn
+  handler          = "main.handler"
+  runtime          = "python3.11"
+  memory_size      = 256
+  timeout          = 10
+  filename         = var.lambda_package_zip
+  source_code_hash = filebase64sha256(var.lambda_package_zip)
 
   environment {
     variables = {
@@ -84,9 +82,4 @@ resource "aws_lambda_function" "mbd_api_lambda_handler" {
     }
   }
 
-  filename = var.lambda_package_zip
-
-  lifecycle {
-    replace_triggered_by = [terraform_data.lambda_upload_trigger]
-  }
 }

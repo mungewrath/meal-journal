@@ -7,7 +7,9 @@ import traceback
 from fastapi import FastAPI, Header, Request
 from fastapi.responses import JSONResponse
 from mangum import Mangum
+from dto.food_create import FoodCreate
 from dto.preferences_update import PreferencesUpdate
+from foods.food import MbdFood, MbdFoodList
 from shared.auth import get_user_id
 from preferences.preferences import MbdPreferences
 from dotenv import load_dotenv
@@ -87,3 +89,43 @@ async def update_preferences(
     prefs.save()
 
     return prefs.to_dto()
+
+
+@app.post("/foods")
+async def create_food(
+    request: FoodCreate,
+    authorization: Annotated[str | None, Header()] = None,
+) -> dict:
+    user_id = get_user_id(authorization)
+    try:
+        food_list = MbdFoodList.get(user_id)
+    except MbdFoodList.DoesNotExist:
+        food_list = MbdFoodList(user_id=user_id)
+
+    food = MbdFood(
+        food_id=request.id,
+        name=request.name,
+        thumbnail=request.thumbnail,
+    )
+    food_list.foods = list(
+        filter((lambda f: f.food_id != food.food_id), food_list.foods)
+    )
+    food_list.foods.append(food)
+    food_list.save()
+
+    return food.to_dto()
+
+
+@app.get("/foods/{food_id}")
+async def get_food(
+    food_id: str, authorization: Annotated[str | None, Header()] = None
+) -> dict:
+    food_list = MbdFoodList.get(get_user_id(authorization))
+    food = next((f for f in food_list.foods if f.food_id == food_id), None)
+    return food.to_dto()
+
+
+@app.get("/foods")
+async def get_foods(authorization: Annotated[str | None, Header()] = None) -> dict:
+    food_list = MbdFoodList.get(get_user_id(authorization))
+    return food_list.to_dto()

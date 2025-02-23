@@ -53,7 +53,32 @@ resource "aws_iam_policy" "lambda_dynamodb_access" {
           "dynamodb:Scan",
           "dynamodb:Query"
         ]
-        Resource = aws_dynamodb_table.mj_user_preferences.arn
+        Resource = aws_dynamodb_table.mbd_user_preferences.arn
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "dynamodb:PutItem",
+          "dynamodb:GetItem",
+          "dynamodb:UpdateItem",
+          "dynamodb:DeleteItem",
+          "dynamodb:Scan",
+          "dynamodb:Query"
+        ]
+        Resource = aws_dynamodb_table.mbd_meals.arn
+      },
+
+      {
+        Effect = "Allow"
+        Action = [
+          "dynamodb:PutItem",
+          "dynamodb:GetItem",
+          "dynamodb:UpdateItem",
+          "dynamodb:DeleteItem",
+          "dynamodb:Scan",
+          "dynamodb:Query"
+        ]
+        Resource = aws_dynamodb_table.mbd_foods.arn
       },
     ]
   })
@@ -78,7 +103,10 @@ resource "aws_lambda_function" "mbd_api_lambda_handler" {
 
   environment {
     variables = {
-      PREFERENCES_DB_NAME = aws_dynamodb_table.mj_user_preferences.name
+      PREFERENCES_DB_NAME = aws_dynamodb_table.mbd_user_preferences.name
+      MEALS_DB_NAME       = aws_dynamodb_table.mbd_meals.name
+      FOODS_DB_NAME       = aws_dynamodb_table.mbd_foods.name
+      # SYMPTOMS_DB_NAME    = aws_dynamodb_table.mbd_symptoms.name
     }
   }
 

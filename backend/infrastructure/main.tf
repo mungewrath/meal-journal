@@ -103,7 +103,7 @@ resource "aws_s3_object" "mj_vite_app_files" {
   key          = each.value
   source       = "../../prototype-ui/dist/${each.value}"
   acl          = "public-read"
-  content_type = lookup(local.content_type_map, split(".", "../../prototype-ui/dist/${each.value}")[3], "text/html")
+  content_type = lookup(local.content_type_map, split(".", "../../prototype-ui/dist/${each.value}")[5], "text/html")
 }
 
 # Cloudfront Distribution
@@ -149,7 +149,7 @@ resource "aws_cloudfront_distribution" "mj_distribution" {
     }
 
     min_ttl                   = 0
-    default_ttl               = 86400
+    default_ttl               = 300
     max_ttl                   = 31536000
     compress                  = true
     field_level_encryption_id = ""

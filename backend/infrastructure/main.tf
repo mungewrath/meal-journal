@@ -1,44 +1,44 @@
+terraform {
+  backend "s3" {
+    bucket = "mbd-terraform-state"
+    key    = "tfstate"
+    region = "us-west-2"
+  }
+}
+
+variable "workspace_iam_roles" {
+  default = {
+    stage = "arn:aws:iam::412381782673:role/terraform"
+    prod  = "arn:aws:iam::034362048865:role/terraform"
+  }
+}
+
 provider "aws" {
   region = "us-west-2"
+
+  assume_role {
+    role_arn = var.workspace_iam_roles[terraform.workspace]
+  }
 }
 
 variable "region" {
   default = "us-west-2"
 }
 
-# resource "aws_lambda_function" "default_preferences" {
-#   filename         = "lambda.zip"
-#   function_name    = "default_preferences"
-#   role             = aws_iam_role.lambda_exec.arn
-#   handler          = "index.handler"
-#   runtime          = "nodejs14.x"
-#   source_code_hash = filebase64sha256("lambda.zip")
-# }
+# Environment-specific values #
+variable "mbd_bucket_name" {
+  default = {
+    stage = "mbd-static-website-stage"
+    prod  = "mbd-static-website"
+  }
+}
 
-
-
-# resource "aws_api_gateway_resource" "preferences" {
-#   rest_api_id = aws_api_gateway_rest_api.mj_api.id
-#   parent_id   = aws_api_gateway_rest_api.mj_api.root_resource_id
-#   path_part   = "preferences"
-# }
-
-# resource "aws_api_gateway_method" "get_preferences" {
-#   rest_api_id   = aws_api_gateway_rest_api.mj_api.id
-#   resource_id   = aws_api_gateway_resource.preferences.id
-#   http_method   = "GET"
-#   authorization = "COGNITO_USER_POOLS"
-#   authorizer_id = aws_api_gateway_authorizer.cognito.id
-# }
-
-# resource "aws_api_gateway_integration" "lambda" {
-#   rest_api_id             = aws_api_gateway_rest_api.mj_api.id
-#   resource_id             = aws_api_gateway_resource.preferences.id
-#   http_method             = aws_api_gateway_method.get_preferences.http_method
-#   type                    = "AWS_PROXY"
-#   integration_http_method = "POST"
-#   uri                     = aws_lambda_function.default_preferences.invoke_arn
-# }
+variable "aws_cognito_user_pool_domain" {
+  default = {
+    stage = "mbd-user-pool-domain-stage"
+    prod  = "mj-user-pool-domain"
+  }
+}
 
 # Managed Cognito User Pool #
 resource "aws_cognito_user_pool" "mj_user_pool" {
@@ -56,7 +56,7 @@ resource "aws_cognito_user_pool_client" "mj_user_pool_client" {
 }
 
 resource "aws_cognito_user_pool_domain" "mj_user_pool_domain" {
-  domain       = "mj-user-pool-domain"
+  domain       = var.aws_cognito_user_pool_domain[terraform.workspace]
   user_pool_id = aws_cognito_user_pool.mj_user_pool.id
 }
 
@@ -84,7 +84,34 @@ resource "aws_iam_role_policy_attachment" "lambda_policy" {
 
 # Cloudfront Website Hosting #
 resource "aws_s3_bucket" "mj_static_website" {
-  bucket = "mbd-static-website"
+  bucket = var.mbd_bucket_name[terraform.workspace]
+
+}
+
+resource "aws_s3_bucket_ownership_controls" "mj_bucket_ownership" {
+  bucket = aws_s3_bucket.mj_static_website.id
+  rule {
+    object_ownership = "BucketOwnerPreferred"
+  }
+}
+
+resource "aws_s3_bucket_public_access_block" "mj_static_public_access_block" {
+  bucket = aws_s3_bucket.mj_static_website.id
+
+  block_public_acls = false
+  # block_public_policy     = false
+  # ignore_public_acls      = false
+  # restrict_public_buckets = false
+}
+
+resource "aws_s3_bucket_acl" "mj_static_acl" {
+  depends_on = [
+    aws_s3_bucket_ownership_controls.mj_bucket_ownership,
+    aws_s3_bucket_public_access_block.mj_static_public_access_block,
+  ]
+
+  bucket = aws_s3_bucket.mj_static_website.id
+  acl    = "public-read"
 }
 
 # Upload all files in the dist folder as s3 objects

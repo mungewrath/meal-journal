@@ -67,7 +67,6 @@ resource "aws_iam_policy" "lambda_dynamodb_access" {
         ]
         Resource = aws_dynamodb_table.mbd_meals.arn
       },
-
       {
         Effect = "Allow"
         Action = [

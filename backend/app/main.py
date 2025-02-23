@@ -1,3 +1,4 @@
+from datetime import datetime, timedelta, timezone
 import logging
 import os
 from typing import Annotated
@@ -8,8 +9,10 @@ from fastapi import FastAPI, Header, Request
 from fastapi.responses import JSONResponse
 from mangum import Mangum
 from dto.food_create import FoodCreate
+from dto.meal_create import MealCreate
 from dto.preferences_update import PreferencesUpdate
 from foods.food import MbdFood, MbdFoodList
+from meals.meal import MbdMeal
 from shared.auth import get_user_id
 from preferences.preferences import MbdPreferences
 from dotenv import load_dotenv
@@ -129,3 +132,46 @@ async def get_food(
 async def get_foods(authorization: Annotated[str | None, Header()] = None) -> dict:
     food_list = MbdFoodList.get(get_user_id(authorization))
     return food_list.to_dto()
+
+
+@app.post("/meals")
+async def save_meal(
+    request: MealCreate,
+    authorization: Annotated[str | None, Header()] = None,
+) -> dict:
+    user_id = get_user_id(authorization)
+
+    meal = MbdMeal(
+        user_id=user_id,
+        meal_type=request.meal_type,
+        date_time=request.date_time,
+        foods=[
+            MbdFood(
+                food_id=food.food_id,
+                name=food.name,
+                thumbnail=food.thumbnail,
+            )
+            for food in request.foods
+        ],
+    )
+    meal.save()
+
+    return meal.to_dto()
+
+
+@app.get("/meals/history")
+async def get_meal_history(
+    days: int = 3,
+    offset: int = 0,
+    authorization: Annotated[str | None, Header()] = None,
+) -> list[dict]:
+    user_id = get_user_id(authorization)
+    meals = MbdMeal.query(
+        hash_key=user_id,
+        range_key_condition=MbdMeal.date_time.between(
+            datetime.now(timezone.utc) - timedelta(days=days + offset),
+            datetime.now(timezone.utc) - timedelta(days=offset),
+        ),
+    )
+    meals = sorted(meals, key=lambda meal: meal.date_time, reverse=True)
+    return [meal.to_dto() for meal in meals]

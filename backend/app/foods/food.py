@@ -16,7 +16,7 @@ class MbdFood(MapAttribute):
 
     def to_dto(self) -> dict:
         return {
-            "id": self.food_id,
+            "food_id": self.food_id,
             "name": self.name,
             "thumbnail": self.thumbnail,
         }
@@ -32,6 +32,5 @@ class MbdFoodList(Model):
 
     def to_dto(self) -> dict:
         return {
-            "userId": self.user_id,
             "foods": [food.to_dto() for food in self.foods],
         }

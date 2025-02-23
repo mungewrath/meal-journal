@@ -271,6 +271,17 @@ paths:
           description: Food added successfully
         400:
           description: Invalid input
+    get:
+      summary: Get details for all foods created by the user
+      responses:
+        200:
+          description: Details of the food
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Food"
 
   /foods/suggested/{mealType}:
     get:
@@ -285,28 +296,6 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/Food"
-
-  /foods/{foodId}:
-    get:
-      summary: Get food details
-      description: Retrieves details about a specific food.
-      parameters:
-        - in: path
-          name: foodId
-          required: true
-          description: The unique ID of the food
-          schema:
-            type: string
-            format: uuid
-      responses:
-        200:
-          description: Details of the food
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Food"
-        404:
-          description: Food not found
 
   /foods/fromPhoto:
     post:

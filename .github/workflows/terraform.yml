@@ -155,6 +155,7 @@ jobs:
       - name: Terraform Plan
         run: |
           cd backend/infrastructure
+          ls ../../prototype-ui
           terraform fmt -check
           terraform plan -input=false
 

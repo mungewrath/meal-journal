@@ -64,7 +64,7 @@ jobs:
           cd prototype-ui
           ${{ steps.detect-package-manager.outputs.manager }} ${{ steps.detect-package-manager.outputs.command }}
       - name: Build with Next.js
-        run: ${{ steps.detect-package-manager.outputs.runner }} run build
+        run: npm run build
       - name: Archive build
         uses: actions/upload-artifact@v4
         with:

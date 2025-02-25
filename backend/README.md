@@ -11,5 +11,7 @@ To run directly from the terminal: `./run.sh`
 
 ## Building and Deploying
 
-`./build-and-upload.sh -fs` - Packages the lambda into a zip file (later consumed by Terraform)
-In infrastructure dir: `terraform apply`
+`./build-and-upload.sh` does all the steps needed for deploying:
+- Packages the lambda into a zip file
+- Runs `terraform apply`, updating AWS infrastructure
+- Deploys the latest lambda code

@@ -18,7 +18,7 @@ while getopts "sf" opt; do
             ;;
         \? )
             echo "Usage: $0 [-s]"
-            echo "  -s: Skip S3 upload"
+            echo "  -s: Skip deployment"
             echo "  -f: Clean build, deleting the packages directory"
             echo "  -h: Show this help message"
             exit 1
@@ -36,6 +36,7 @@ uv pip install \
    --target packages \
    -r requirements.txt
 
+# Both of these directories must have their contents at the root of the zip file, per AWS Lambda requirements
 cd packages
 zip -qr ../${ARCHIVE_NAME} .
 cd ..

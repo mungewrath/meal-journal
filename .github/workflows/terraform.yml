@@ -143,6 +143,13 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: dist
+          path: prototype-ui
+
+      - name: Download Lambda Build
+        uses: actions/download-artifact@v4
+        with:
+          name: api_lambda.zip
+          path: backend
 
       # Generates an execution plan for Terraform
       - name: Terraform Plan

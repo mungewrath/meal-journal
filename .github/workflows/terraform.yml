@@ -17,6 +17,7 @@ jobs:
   prototype-ui-build:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
       - name: Detect package manager
         id: detect-package-manager
         run: |

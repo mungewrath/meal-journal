@@ -110,18 +110,20 @@ jobs:
       terraform_workspace: stage
     #   secrets: inherit
 
-  deploy-prod:
+  deploy-prod-gate:
     runs-on: ubuntu-latest
     needs:
       - deploy-stage
     environment: # Gates with manual approval
       name: production
-    steps:
-      - name: "Deploy to prod"
-        uses: ./.github/workflows/terraform.yml
-        with:
-          terraform_workspace: prod
-          secrets: inherit
+
+  deploy-prod:
+    name: "Deploy to prod"
+    needs:
+      - deploy-prod-gate
+    uses: ./.github/workflows/terraform.yml
+    with:
+      terraform_workspace: prod
 #   terraform-stage:
 #     name: "Terraform Stage"
 #     runs-on: ubuntu-latest

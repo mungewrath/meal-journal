@@ -116,6 +116,9 @@ jobs:
       - deploy-stage
     environment: # Gates with manual approval
       name: production
+    steps:
+      - name: Wait for manual approval
+        run: echo "Proceeding with deploy..."
 
   deploy-prod:
     name: "Deploy to prod"

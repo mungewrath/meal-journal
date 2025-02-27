@@ -14,7 +14,6 @@ This is the web app for My Belly's Diary. It is actively under development as is
 
 - Critical VS Code Extensions
     - ESLint (Microsoft)
-    - Tailwind CSS IntelliSense (Tailwind Labs)
     
 - Helpful VS Code Extension
     - JS JSX Snippets (Nai You Ran)

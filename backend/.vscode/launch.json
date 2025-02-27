@@ -6,7 +6,7 @@
       "type": "debugpy",
       "request": "launch",
       "module": "fastapi",
-      "cwd": "${workspaceFolder}/backend/app",
+      "cwd": "${workspaceFolder}/app",
       "args": ["dev"],
       "justMyCode": false,
       "env": {
@@ -18,7 +18,7 @@
     //   "type": "debugpy",
     //   "request": "launch",
     //   "module": "fastapi",
-    //   "cwd": "${workspaceFolder}/backend/app",
+    //   "cwd": "${workspaceFolder}/app",
     //   "args": ["run"],
     //   "justMyCode": false,
     //   "env": {

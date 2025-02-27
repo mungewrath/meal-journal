@@ -108,7 +108,7 @@ jobs:
     uses: ./.github/workflows/terraform.yml
     with:
       terraform_workspace: stage
-      secrets: inherit
+    #   secrets: inherit
 
   deploy-prod:
     runs-on: ubuntu-latest

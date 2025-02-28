@@ -13,16 +13,16 @@ This is the web app for My Belly's Diary. It is actively under development as is
 ## Dev Tools
 
 - Critical VS Code Extensions
-    - ESLint (Microsoft)
-    
+  - ESLint (Microsoft)
+  - Prettier (Prettier)
 - Helpful VS Code Extension
-    - JS JSX Snippets (Nai You Ran)
-    - ES7+ React/Redux/React-Native snippets (dsznajder)
-    - Git Graph (mhutchie)
+  - JS JSX Snippets (Nai You Ran)
+  - ES7+ React/Redux/React-Native snippets (dsznajder)
+  - Git Graph (mhutchie)
 
 ---
 
 # Reference
 
 - This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
-    - [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
+  - [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.

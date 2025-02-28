@@ -4,6 +4,7 @@ import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Link from "@mui/material/Link";
 import NextLink from "next/link";
+import { Counter } from "@/ui/Counter";
 
 export default function Home() {
   return (
@@ -25,6 +26,9 @@ export default function Home() {
             <Link href="/link" color="secondary" component={NextLink}>
               Test link
             </Link>
+          </Box>
+          <Box>
+            <Counter />
           </Box>
         </Container>
       </main>

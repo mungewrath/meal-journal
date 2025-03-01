@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Box, Button, Typography, TextField } from "@mui/material";
+import { Box, Button, TextField, Typography } from "@mui/material";
 
 import {
   decrement,
@@ -34,9 +34,7 @@ export const Counter = () => {
         >
           -
         </Button>
-        <Typography component="paragraph" aria-label="Count">
-          {count}
-        </Typography>
+        <Typography aria-label="Count">{count}</Typography>
         <Button
           variant="outlined"
           size="small"

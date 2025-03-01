@@ -2,7 +2,7 @@
 
 This is the web app for My Belly's Diary. It is actively under development as is this README. For now, please refer to the notes below and reach out to a dev when further clarification is needed.
 
-# Important Setup / Tech
+# Development Setup
 
 1. You must have [Node.js](https://nodejs.org) installed, the project was initially developed with Node v22.13.0
 2. mbd-web utilizes [pnpm](https://pnpm.io) as its package manager. Please install using `npm i -g pnpm`
@@ -12,6 +12,9 @@ This is the web app for My Belly's Diary. It is actively under development as is
 
 ## Dev Tools
 
+- Chrome Extensions
+  - React Developer Tools
+  - Redux DevTools
 - Critical VS Code Extensions
   - ESLint (Microsoft)
   - Prettier (Prettier)
@@ -19,6 +22,25 @@ This is the web app for My Belly's Diary. It is actively under development as is
   - JS JSX Snippets (Nai You Ran)
   - ES7+ React/Redux/React-Native snippets (dsznajder)
   - Git Graph (mhutchie)
+
+# Important Tech Decisions
+
+- Next.js is configured to export the app as a Single Page App (SPA) to save with hosting costs. **Please refrain from utilizing Server-Side Rendering (SSR) for now.**
+
+## Tech Used
+
+- Next.js
+- React
+- TypeScript
+- ESLint
+- Material UI
+- Emotion
+- Redux
+- Markdown
+- pnpm
+- VS Code
+- Prettier
+- Git
 
 ---
 

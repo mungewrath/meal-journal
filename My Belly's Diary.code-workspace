@@ -23,5 +23,11 @@
             "markdown": false,
             "scminput": false
         }
-    }
+    },
+	"extensions": {
+		"recommendations": [
+			"github.copilot",
+			"github.copilot-chat",
+		]
+	}
 }

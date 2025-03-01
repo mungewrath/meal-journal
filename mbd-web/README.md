@@ -12,16 +12,11 @@ This is the web app for My Belly's Diary. It is actively under development as is
 
 ## Dev Tools
 
-- Chrome Extensions
+- Install Chrome Extensions
   - React Developer Tools
   - Redux DevTools
-- Critical VS Code Extensions
-  - ESLint (Microsoft)
-  - Prettier (Prettier)
-- Helpful VS Code Extension
-  - JS JSX Snippets (Nai You Ran)
-  - ES7+ React/Redux/React-Native snippets (dsznajder)
-  - Git Graph (mhutchie)
+- Install Recommended VS Code Extensions
+  - Use VS Code's "Recommended" Extension filter, or check `.vscode/extensions.json`
 
 # Important Tech Decisions
 

@@ -1,0 +1,33 @@
+{
+	"folders": [
+		{
+			"name": "Backend",
+			"path": "backend"
+		},
+		{
+			"name": "Web",
+			"path": "mbd-web"
+		},
+		{
+			"name": "Prototype UI",
+			"path": "prototype-ui"
+		},
+		{	"name": "Docs",
+			"path": "docs"
+		}
+	],
+	"settings": {
+        "github.copilot.enable": {
+            "*": true,
+            "plaintext": false,
+            "markdown": false,
+            "scminput": false
+        }
+    },
+	"extensions": {
+		"recommendations": [
+			"github.copilot",
+			"github.copilot-chat",
+		]
+	}
+}

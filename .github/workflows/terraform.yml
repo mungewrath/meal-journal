@@ -46,6 +46,12 @@ jobs:
           terraform init
           terraform workspace select ${{ inputs.terraform_workspace }}
 
+      - name: Download Web Build
+        uses: actions/download-artifact@v4
+        with:
+          name: mbd-web-build
+          path: mbd-web/out
+          
       - name: Download UI Build
         uses: actions/download-artifact@v4
         with:

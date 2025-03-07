@@ -133,6 +133,7 @@ jobs:
 
   deploy-stage:
     needs:
+      - web-build
       - prototype-ui-build
       - backend-build
     uses: ./.github/workflows/terraform.yml

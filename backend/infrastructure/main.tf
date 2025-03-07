@@ -123,12 +123,12 @@ resource "aws_s3_bucket_acl" "mbd_web_acl" {
 # Upload all files in the dist folder as s3 objects
 locals {
   content_type_map = {
-    "js"   = "text/javascript"
-    "html" = "text/html"
-    "css"  = "text/css"
-    "ico"  = "image/vnd.microsoft.icon"
-    "txt"  = "text/plain"
-    "woff2"= "font/woff2"
+    "js"    = "text/javascript"
+    "html"  = "text/html"
+    "css"   = "text/css"
+    "ico"   = "image/vnd.microsoft.icon"
+    "txt"   = "text/plain"
+    "woff2" = "font/woff2"
   }
 }
 
@@ -213,8 +213,6 @@ resource "aws_cloudfront_origin_access_identity" "mbd_oai" {
 output "mbd_web_cloudfront_domain_name" {
   value = aws_cloudfront_distribution.mbd_web_distribution.domain_name
 }
-
-##############################################################################
 
 resource "aws_s3_bucket" "mj_static_website" {
   bucket = var.mbd_bucket_name[terraform.workspace]

@@ -66,7 +66,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: api_lambda.zip
-          path: ../
+          path: ../../backend
 
       # Generates an execution plan for Terraform
       - name: Terraform Plan

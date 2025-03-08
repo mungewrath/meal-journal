@@ -146,7 +146,7 @@ jobs:
     uses: ./.github/workflows/terraform.yml
     with:
       terraform_workspace: stage
-      terraform_apply: ${{ github.ref == 'refs/heads/main' && github.event_name == 'push' && 'true' || (inputs.terraform_apply_stage || 'false') }}
+      terraform_apply: ${{ github.ref == 'refs/heads/main' && github.event_name == 'push' && true || (inputs.terraform_apply_stage || false) }}
     #   secrets: inherit
 
   deploy-prod-gate:

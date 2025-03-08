@@ -36,10 +36,10 @@ jobs:
             ${{ github.workspace }}/mbd-web/.next/cache
             ${{ github.workspace }}/mbd-web/node_modules
           # Generate a new cache whenever packages or source files change.
-          key: ${{ runner.os }}-mbd-web-${{ hashFiles('**/pnpm-lock.json') }}-${{ hashFiles('**/*.js', '**/*.jsx', '**/*.ts', '**/*.tsx') }}
+          key: ${{ runner.os }}-mbd-web-${{ hashFiles('**/pnpm-lock.yaml') }}-${{ hashFiles('**/*.js', '**/*.jsx', '**/*.ts', '**/*.tsx') }}
           # If source files changed but packages didn't, rebuild from a prior cache.
           restore-keys: |
-            ${{ runner.os }}-mbd-web-${{ hashFiles('**/pnpm-lock.json') }}-
+            ${{ runner.os }}-mbd-web-${{ hashFiles('**/pnpm-lock.yaml') }}-
       - name: Install pnpm
         uses: pnpm/action-setup@v4
         with:

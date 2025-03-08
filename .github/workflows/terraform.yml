@@ -27,7 +27,6 @@ jobs:
     defaults:
       run:
         shell: bash
-        working-directory: ./backend/infrastructure
 
     steps:
       # Checkout the repository to the GitHub Actions runner
@@ -47,6 +46,7 @@ jobs:
       # Initialize a new or existing Terraform working directory by creating initial files, loading any remote state, downloading modules, etc.
       - name: Terraform Init
         run: |
+          cd backend/infrastructure
           terraform init
           terraform workspace select ${{ inputs.terraform_workspace }}
 
@@ -54,23 +54,24 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: mbd-web-build
-          path: ../../mbd-web/out
+          path: mbd-web/out
           
       - name: Download UI Build
         uses: actions/download-artifact@v4
         with:
           name: dist
-          path: ../../prototype-ui/dist
+          path: prototype-ui/dist
 
       - name: Download Lambda Build
         uses: actions/download-artifact@v4
         with:
           name: api_lambda.zip
-          path: ../../backend
+          path: backend
 
       # Generates an execution plan for Terraform
       - name: Terraform Plan
         run: |
+          cd backend/infrastructure
           echo "Checking Terraform formatting..."
           terraform fmt -check
           echo "Generate Terraform execution plan..."

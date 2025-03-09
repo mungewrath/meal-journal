@@ -133,6 +133,7 @@ resource "aws_s3_object" "mbd_web_build" {
   source       = "../../mbd-web/out/${each.value}"
   acl          = "public-read"
   content_type = lookup(local.content_type_map, split(".", "../../mbd-web/out/${each.value}")[5], "text/html")
+  etag         = filemd5("../../mbd-web/out/${each.value}")
 }
 
 # Cloudfront Distribution

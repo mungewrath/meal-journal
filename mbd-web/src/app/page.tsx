@@ -24,7 +24,7 @@ export default function Home() {
               My Belly&apos;s Diary
             </Typography>
             <Link href="/link" color="secondary" component={NextLink}>
-              Test link
+              Remote Build-a-Bear Test Link
             </Link>
           </Box>
           <Box>

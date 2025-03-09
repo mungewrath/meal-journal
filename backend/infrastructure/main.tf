@@ -28,13 +28,6 @@ variable "region" {
 # Environment-specific values #
 variable "mbd_web_bucket_name" {
   default = {
-    stage = "mbd-web-stage"
-    prod  = "mbd-web"
-  }
-}
-
-variable "mbd_bucket_name" {
-  default = {
     stage = "mbd-static-website-stage"
     prod  = "mbd-static-website"
   }
@@ -58,7 +51,7 @@ resource "aws_cognito_user_pool_client" "mj_user_pool_client" {
   allowed_oauth_flows_user_pool_client = true
   allowed_oauth_flows                  = ["code"]
   allowed_oauth_scopes                 = ["phone", "email", "openid", "profile"]
-  callback_urls                        = ["http://localhost:5173", "https://${aws_cloudfront_distribution.mj_distribution.domain_name}"]
+  callback_urls                        = ["http://localhost:3000", "https://${aws_cloudfront_distribution.mbd_web_distribution.domain_name}"]
   supported_identity_providers         = ["COGNITO"]
 }
 
@@ -212,118 +205,4 @@ resource "aws_cloudfront_origin_access_identity" "mbd_oai" {
 
 output "mbd_web_cloudfront_domain_name" {
   value = aws_cloudfront_distribution.mbd_web_distribution.domain_name
-}
-
-resource "aws_s3_bucket" "mj_static_website" {
-  bucket = var.mbd_bucket_name[terraform.workspace]
-
-}
-
-resource "aws_s3_bucket_ownership_controls" "mj_bucket_ownership" {
-  bucket = aws_s3_bucket.mj_static_website.id
-  rule {
-    object_ownership = "BucketOwnerPreferred"
-  }
-}
-
-resource "aws_s3_bucket_public_access_block" "mj_static_public_access_block" {
-  bucket = aws_s3_bucket.mj_static_website.id
-
-  block_public_acls = false
-  # block_public_policy     = false
-  # ignore_public_acls      = false
-  # restrict_public_buckets = false
-}
-
-resource "aws_s3_bucket_acl" "mj_static_acl" {
-  depends_on = [
-    aws_s3_bucket_ownership_controls.mj_bucket_ownership,
-    aws_s3_bucket_public_access_block.mj_static_public_access_block,
-  ]
-
-  bucket = aws_s3_bucket.mj_static_website.id
-  acl    = "public-read"
-}
-
-# Upload all files in the dist folder as s3 objects
-resource "aws_s3_object" "mj_vite_app_files" {
-  for_each = fileset("../../prototype-ui/dist", "**")
-
-  bucket       = aws_s3_bucket.mj_static_website.bucket
-  key          = each.value
-  source       = "../../prototype-ui/dist/${each.value}"
-  acl          = "public-read"
-  content_type = lookup(local.content_type_map, split(".", "../../prototype-ui/dist/${each.value}")[5], "text/html")
-}
-
-# Cloudfront Distribution
-resource "aws_cloudfront_distribution" "mj_distribution" {
-  origin {
-    domain_name = aws_s3_bucket.mj_static_website.bucket_regional_domain_name
-    origin_id   = "S3Origin"
-
-    s3_origin_config {
-      origin_access_identity = aws_cloudfront_origin_access_identity.mj_oai.cloudfront_access_identity_path
-    }
-  }
-
-  enabled             = true
-  is_ipv6_enabled     = true
-  default_root_object = "index.html"
-
-  default_cache_behavior {
-    target_origin_id       = "S3Origin"
-    viewer_protocol_policy = "redirect-to-https"
-
-    allowed_methods = [
-      "GET",
-      "HEAD",
-      "OPTIONS",
-      "PUT",
-      "PATCH",
-      "POST",
-      "DELETE",
-    ]
-
-    cached_methods = [
-      "GET",
-      "HEAD",
-    ]
-
-    forwarded_values {
-      query_string = false
-
-      cookies {
-        forward = "none"
-      }
-    }
-
-    min_ttl                   = 0
-    default_ttl               = 300
-    max_ttl                   = 31536000
-    compress                  = true
-    field_level_encryption_id = ""
-  }
-
-  restrictions {
-    geo_restriction {
-      restriction_type = "none"
-    }
-  }
-
-  viewer_certificate {
-    cloudfront_default_certificate = true
-  }
-
-  tags = {
-    Name = "mj_distribution"
-  }
-}
-
-resource "aws_cloudfront_origin_access_identity" "mj_oai" {
-  comment = "Origin Access Identity for Meal Journal"
-}
-
-output "cloudfront_domain_name" {
-  value = aws_cloudfront_distribution.mj_distribution.domain_name
 }

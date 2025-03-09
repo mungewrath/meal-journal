@@ -55,12 +55,6 @@ jobs:
         with:
           name: mbd-web-build
           path: mbd-web/out
-          
-      - name: Download UI Build
-        uses: actions/download-artifact@v4
-        with:
-          name: dist
-          path: prototype-ui/dist
 
       - name: Download Lambda Build
         uses: actions/download-artifact@v4

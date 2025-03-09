@@ -26,7 +26,7 @@ while getopts "sf" opt; do
     esac
 done
 
-
+uv python install 3.11
 uv export -q --frozen --no-dev --no-editable -o requirements.txt
 uv pip install \
    --no-installer-metadata \

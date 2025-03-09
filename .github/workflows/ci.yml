@@ -42,7 +42,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: "22"
-          cache: 'pnpm'
+          cache: "pnpm"
           cache-dependency-path: mbd-web/pnpm-lock.yaml
       - name: Install dependencies
         run: pnpm install
@@ -82,7 +82,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: api_lambda.zip
-          path: api_lambda.zip
+          path: backend/api_lambda.zip
 
   deploy-stage:
     name: "Deploy to Stage"

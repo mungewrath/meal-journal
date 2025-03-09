@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -x
 
 # https://docs.astral.sh/uv/guides/integration/aws-lambda/#deploying-a-zip-archive
 

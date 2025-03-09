@@ -9,6 +9,10 @@ on:
         required: true
         type: string
         default: "stage"
+      terraform_apply:
+        required: false
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -46,11 +50,11 @@ jobs:
           terraform init
           terraform workspace select ${{ inputs.terraform_workspace }}
 
-      - name: Download UI Build
+      - name: Download Web Build
         uses: actions/download-artifact@v4
         with:
-          name: dist
-          path: prototype-ui/dist
+          name: mbd-web-build
+          path: mbd-web/out
 
       - name: Download Lambda Build
         uses: actions/download-artifact@v4
@@ -62,12 +66,15 @@ jobs:
       - name: Terraform Plan
         run: |
           cd backend/infrastructure
-          ls ../../prototype-ui/dist
+          echo "Checking Terraform formatting..."
           terraform fmt -check
+          echo "Generate Terraform execution plan..."
           terraform plan -input=false
 
-        # On push to "main", build or change infrastructure according to Terraform configuration files
-        # Note: It is recommended to set up a required "strict" status check in your repository for "Terraform Cloud". See the documentation on "strict" required status checks for more information: https://help.github.com/en/github/administering-a-repository/types-of-required-status-checks
-    # - name: Terraform Apply
-    # if: github.ref == 'refs/heads/"main"' && github.event_name == 'push'
-    # run: terraform apply -auto-approve -input=false
+      # Build or change infrastructure according to Terraform configuration files
+      # Note: It is recommended to set up a required "strict" status check in your repository for "Terraform Cloud". See the documentation on "strict" required status checks for more information: https://help.github.com/en/github/administering-a-repository/types-of-required-status-checks
+      - name: Terraform Apply
+        if: inputs.terraform_apply
+        run: |
+          cd backend/infrastructure
+          terraform apply -auto-approve -input=false

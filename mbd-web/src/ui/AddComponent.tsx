@@ -21,6 +21,7 @@ export default function AddComponent() {
   const [mealName, setMealName] = useState("");
   const [date, setDate] = useState("");
   const [selectedOption, setSelectedOption] = useState("meal");
+  const [expanded, setExpanded] = useState(false);
 
   const handleMealNameChange = (event: SelectChangeEvent<string>) => {
     setMealName(event.target.value as string);
@@ -32,6 +33,13 @@ export default function AddComponent() {
 
   const handleOptionChange = (option: string) => {
     setSelectedOption(option);
+  };
+
+  const handleAccordionChange = (
+    event: React.SyntheticEvent,
+    isExpanded: boolean
+  ) => {
+    setExpanded(isExpanded);
   };
 
   useEffect(() => {
@@ -46,10 +54,14 @@ export default function AddComponent() {
   }, []);
 
   return (
-    <Accordion>
+    <Accordion expanded={expanded} onChange={handleAccordionChange}>
       <AccordionSummary expandIcon={<ExpandMoreIcon />}>
         <Typography>
-          {selectedOption === "meal" ? "Add a Meal" : "Add a Symptom"}
+          {!expanded
+            ? "Add a Meal or Symptom"
+            : selectedOption === "meal"
+              ? "Add a Meal"
+              : "Add a Symptom"}
         </Typography>
       </AccordionSummary>
       <AccordionDetails>
@@ -87,13 +99,15 @@ export default function AddComponent() {
               type="date"
               value={date}
               onChange={handleDateChange}
-              InputLabelProps={{ shrink: true }}
+              slotProps={{ inputLabel: { shrink: true } }}
               sx={{ flexGrow: 1 }}
             />
             <TextField
               label="Time"
               type="time"
-              InputLabelProps={{ shrink: true }}
+              slotProps={{
+                inputLabel: { shrink: true },
+              }}
               sx={{ flexGrow: 1 }}
             />
           </Box>

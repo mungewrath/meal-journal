@@ -1,7 +1,7 @@
 "use client";
 import * as React from "react";
 import Header from "./Header";
-import AddComponent from "./AddComponent";
+import AddComponent from "../ui/AddComponent";
 import { Box, Container, Typography } from "@mui/material";
 import { MealHistory } from "../ui/MealHistory";
 

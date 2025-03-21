@@ -1,6 +1,7 @@
 "use client";
 
 import { Box, Typography, CircularProgress, Button, Chip } from "@mui/material";
+import { useEffect } from "react";
 import { useAppSelector, useAppDispatch } from "@/lib/hooks";
 import {
   selectMeals,
@@ -13,8 +14,15 @@ export const MealHistory = () => {
   const loading = useAppSelector(selectLoading);
   const dispatch = useAppDispatch();
 
+  useEffect(() => {
+    dispatch(fetchMeals({ days: 3, offset: 0 }));
+  }, [dispatch]);
+
   const handleFetchMeals = () => {
-    dispatch(fetchMeals({ days: 7, offset: 0 }));
+    const daysLoaded = new Set(
+      meals.map((meal) => new Date(meal.dateTime).toDateString())
+    ).size;
+    dispatch(fetchMeals({ days: 1, offset: daysLoaded }));
   };
 
   const formatDate = (dateString: string) => {
@@ -39,9 +47,6 @@ export const MealHistory = () => {
 
   return (
     <Box sx={{ height: "400px", overflow: "auto" }}>
-      <Button onClick={handleFetchMeals} variant="contained" color="primary">
-        Fetch Meals
-      </Button>
       {meals
         .slice()
         .sort(
@@ -64,6 +69,11 @@ export const MealHistory = () => {
           </Box>
         ))}
       {loading && <CircularProgress />}
+      <Box display="flex" justifyContent="center" mt={2}>
+        <Button onClick={handleFetchMeals} variant="contained" color="primary">
+          Load More
+        </Button>
+      </Box>
     </Box>
   );
 };

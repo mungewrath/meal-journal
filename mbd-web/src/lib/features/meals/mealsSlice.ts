@@ -35,7 +35,7 @@ export const fetchMeals = createAsyncThunk(
   async ({ days, offset }: { days: number; offset: number }) => {
     // const response = await axios.get(`/api/meals/history?days=${days}&offset=${offset}`);
     // return response.data;
-    return generateMockMeals();
+    return generateMockMeals(days, offset);
   }
 );
 

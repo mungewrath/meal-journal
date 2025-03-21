@@ -36,7 +36,7 @@ export const MealHistory = () => {
     } else if (date.toDateString() === yesterday.toDateString()) {
       return "Yesterday's";
     } else {
-      return `${date.getMonth() + 1}/${date.getDate()}`;
+      return `${date.getMonth() + 1}/${date.getDate()} ${date.toLocaleDateString("en-US", { weekday: "short" })}'s`;
     }
   };
 

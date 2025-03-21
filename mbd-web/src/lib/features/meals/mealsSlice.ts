@@ -1,5 +1,6 @@
 import { createAppSlice } from "@/lib/createAppSlice";
 import { createAsyncThunk } from "@reduxjs/toolkit";
+import { generateMockMeals } from "./mockData";
 // import axios from "axios";
 
 interface Food {
@@ -34,26 +35,7 @@ export const fetchMeals = createAsyncThunk(
   async ({ days, offset }: { days: number; offset: number }) => {
     // const response = await axios.get(`/api/meals/history?days=${days}&offset=${offset}`);
     // return response.data;
-    return [
-      {
-        id: "1",
-        mealType: "breakfast",
-        dateTime: "2023-10-01T08:00:00Z",
-        foods: [
-          { id: "1", name: "Eggs", thumbnail: "egg.jpg" },
-          { id: "2", name: "Bacon", thumbnail: "bacon.jpg" },
-        ],
-      },
-      {
-        id: "2",
-        mealType: "lunch",
-        dateTime: "2023-10-01T12:00:00Z",
-        foods: [
-          { id: "3", name: "Sandwich", thumbnail: "sandwich.jpg" },
-          { id: "4", name: "Salad", thumbnail: "salad.jpg" },
-        ],
-      },
-    ];
+    return generateMockMeals();
   }
 );
 

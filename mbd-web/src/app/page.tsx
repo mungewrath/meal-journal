@@ -3,6 +3,7 @@ import * as React from "react";
 import Header from "./Header";
 import AddComponent from "./AddComponent";
 import { Box, Container, Typography } from "@mui/material";
+import { MealHistory } from "../ui/MealHistory";
 
 export default function Home() {
   return (
@@ -14,6 +15,7 @@ export default function Home() {
             Welcome to My Belly&apos;s Diary
           </Typography>
           <AddComponent />
+          <MealHistory />
         </Box>
       </Container>
     </div>

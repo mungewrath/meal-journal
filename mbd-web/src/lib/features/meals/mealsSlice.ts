@@ -31,7 +31,6 @@ const initialState: MealsState = {
 // Commenting out the API call and using mock data instead
 export const fetchMeals = createAsyncThunk(
   "meals/fetchMeals",
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async ({ days, offset }: { days: number; offset: number }) => {
     // const response = await axios.get(`/api/meals/history?days=${days}&offset=${offset}`);
     // return response.data;

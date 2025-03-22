@@ -1,11 +1,11 @@
 "use client";
 
 import React from "react";
-import { useAuth } from "react-oidc-context";
+import { AuthContextProps, useAuth } from "react-oidc-context";
 import Button from "@mui/material/Button";
 
 function LoginPage() {
-  const auth = useAuth();
+  const auth: AuthContextProps = useAuth();
 
   if (auth.isLoading) {
     return (
@@ -28,7 +28,7 @@ function LoginPage() {
     return (
       <div className="min-h-screen bg-gray-50">
         <div className="max-w-2xl mx-auto p-4 space-y-4">
-          Welcome, {auth.user?.profile["cognito:username"]}
+          Welcome, {auth.user?.profile["cognito:username"] as string}
           <div className="space-y-2 overflow-x-auto">
             <pre> ID Token: {auth.user?.id_token} </pre>
             <pre> Access Token: {auth.user?.access_token} </pre>

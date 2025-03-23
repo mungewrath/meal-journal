@@ -19,13 +19,13 @@ permissions:
 
 jobs:
   web-build-stage:
-    name: "Web Build (Stage)"
+    name: "Web (Stage)"
     uses: ./.github/workflows/web_build.yml
     with:
       environment: stage
 
   web-build-prod:
-    name: "Web Build (Prod)"
+    name: "Web (Prod)"
     uses: ./.github/workflows/web_build.yml
     with:
       environment: prod
@@ -69,7 +69,7 @@ jobs:
     with:
       terraform_workspace: stage
       terraform_apply: ${{ github.ref == 'refs/heads/main' && github.event_name == 'push' && true || (inputs.terraform_apply_stage || false) }}
-    #   secrets: inherit
+      web_build_environment: stage
 
   deploy-prod-gate:
     name: "Deploy to Prod Approval"
@@ -93,3 +93,4 @@ jobs:
     with:
       terraform_workspace: prod
       terraform_apply: true
+      web_build_environment: prod

@@ -17,7 +17,7 @@ permissions:
 
 jobs:
   web-build:
-    name: "${{inputs.environment}} Build"
+    name: "Build"
     runs-on: ubuntu-latest
     defaults:
       run:

@@ -21,6 +21,7 @@ This is the web app for My Belly's Diary. It is actively under development as is
 # Important Tech Decisions
 
 - Next.js is configured to export the app as a Single Page App (SPA) to save with hosting costs. **Please refrain from utilizing Server-Side Rendering (SSR) for now.**
+- Variables are set locally using the `.env.development` file. Deployments to Stage and Prod bake in the contents of `.env.stage` and `.env.prod` respectively. See web_build.yml for details.
 
 ## Tech Used
 

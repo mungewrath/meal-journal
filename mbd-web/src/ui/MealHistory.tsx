@@ -46,7 +46,7 @@ export const MealHistory = () => {
   };
 
   return (
-    <Box sx={{ height: "400px", overflow: "auto" }}>
+    <Box sx={{ overflow: "auto" }}>
       {meals
         .slice()
         .sort(

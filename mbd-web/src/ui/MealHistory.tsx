@@ -3,6 +3,7 @@
 import { Box, Typography, CircularProgress, Button, Chip } from "@mui/material";
 import { useEffect } from "react";
 import { useAppSelector, useAppDispatch } from "@/lib/hooks";
+import { useAuth } from "react-oidc-context";
 import {
   selectMeals,
   selectLoading,
@@ -14,15 +15,21 @@ export const MealHistory = () => {
   const loading = useAppSelector(selectLoading);
   const dispatch = useAppDispatch();
 
+  const auth = useAuth();
+  const idToken = auth.isAuthenticated ? auth.user?.id_token : undefined;
+
   useEffect(() => {
-    dispatch(fetchMeals({ days: 3, offset: 0 }));
-  }, [dispatch]);
+    if (auth.isAuthenticated && idToken) {
+      // Test data in chumpy user has meals logged 2/21 and 2/23
+      dispatch(fetchMeals({ days: 27, offset: 4, idToken }));
+    }
+  }, [dispatch, auth, idToken]);
 
   const handleFetchMeals = () => {
     const daysLoaded = new Set(
       meals.map((meal) => new Date(meal.dateTime).toDateString())
     ).size;
-    dispatch(fetchMeals({ days: 1, offset: daysLoaded }));
+    dispatch(fetchMeals({ days: 1, offset: daysLoaded, idToken }));
   };
 
   const formatDate = (dateString: string) => {
@@ -63,7 +70,7 @@ export const MealHistory = () => {
             </Typography>
             <Box mt={1} display="flex" flexWrap="wrap" gap={1}>
               {meal.foods.map((food) => (
-                <Chip key={food.id} label={food.name} />
+                <Chip key={food.id} label={`${food.name} ${food.thumbnail}`} />
               ))}
             </Box>
           </Box>

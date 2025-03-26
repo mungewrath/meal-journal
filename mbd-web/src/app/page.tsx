@@ -1,13 +1,12 @@
 "use client";
-import * as React from "react";
-import Header from "./Header";
-import AddComponent from "../ui/AddComponent";
 import { Box, Container, Typography } from "@mui/material";
-import { MealHistory } from "../ui/MealHistory";
+import { Header } from "./Header";
+import { AddComponent } from "@/ui/AddComponent";
+import { MealHistory } from "@/ui/MealHistory";
 
 export default function Home() {
   return (
-    <div>
+    <>
       <Header />
       <Container>
         <Box my={2}>
@@ -18,6 +17,6 @@ export default function Home() {
           <MealHistory />
         </Box>
       </Container>
-    </div>
+    </>
   );
 }

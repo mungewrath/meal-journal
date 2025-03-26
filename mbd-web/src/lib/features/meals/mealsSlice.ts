@@ -19,13 +19,11 @@ interface Meal {
 interface MealsState {
   meals: Meal[];
   loading: boolean;
-  offset: number;
 }
 
 const initialState: MealsState = {
   meals: [],
   loading: false,
-  offset: 0,
 };
 
 // Commenting out the API call and using mock data instead
@@ -57,8 +55,8 @@ export const mealsSlice = createAppSlice({
       });
   },
   selectors: {
-    selectMeals: (state) => state.meals,
-    selectLoading: (state) => state.loading,
+    selectMeals: (state: MealsState) => state.meals,
+    selectLoading: (state: MealsState) => state.loading,
   },
 });
 

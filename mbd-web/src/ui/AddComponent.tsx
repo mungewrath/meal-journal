@@ -1,27 +1,29 @@
-import * as React from "react";
-import Box from "@mui/material/Box";
-import Typography from "@mui/material/Typography";
-import Accordion from "@mui/material/Accordion";
-import AccordionSummary from "@mui/material/AccordionSummary";
-import AccordionDetails from "@mui/material/AccordionDetails";
+import {
+  Box,
+  Typography,
+  Accordion,
+  AccordionSummary,
+  AccordionDetails,
+  TextField,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel,
+  Button,
+} from "@mui/material";
+import { SelectChangeEvent } from "@mui/material/Select";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import TextField from "@mui/material/TextField";
-import Select, { SelectChangeEvent } from "@mui/material/Select";
-import MenuItem from "@mui/material/MenuItem";
-import FormControl from "@mui/material/FormControl";
-import InputLabel from "@mui/material/InputLabel";
-import Button from "@mui/material/Button";
 import DeleteIcon from "@mui/icons-material/Delete";
 import SaveIcon from "@mui/icons-material/Save";
 import RestaurantIcon from "@mui/icons-material/Restaurant";
 import HealingIcon from "@mui/icons-material/Healing";
 import { useState, useEffect } from "react";
 
-export default function AddComponent() {
+export const AddComponent = () => {
   const [mealName, setMealName] = useState("");
   const [date, setDate] = useState("");
   const [selectedOption, setSelectedOption] = useState("meal");
-  const [expanded, setExpanded] = useState(false);
+  const [expanded, setExpanded] = useState(true);
 
   const handleMealNameChange = (event: SelectChangeEvent<string>) => {
     setMealName(event.target.value as string);
@@ -46,11 +48,6 @@ export default function AddComponent() {
     // Set the default date to today's date
     const today = new Date().toISOString().split("T")[0];
     setDate(today);
-
-    // Example of setting the date from a data call
-    // fetch('/api/getDate')
-    //   .then(response => response.json())
-    //   .then(data => setDate(data.date));
   }, []);
 
   return (
@@ -105,9 +102,7 @@ export default function AddComponent() {
             <TextField
               label="Time"
               type="time"
-              slotProps={{
-                inputLabel: { shrink: true },
-              }}
+              slotProps={{ inputLabel: { shrink: true } }}
               sx={{ flexGrow: 1 }}
             />
           </Box>
@@ -122,6 +117,7 @@ export default function AddComponent() {
                   <MenuItem value="Snack">Snack</MenuItem>
                 </Select>
               </FormControl>
+              {/* TODO: Update food input to allow multiple food entry */}
               <TextField label="Food" multiline rows={4} />
             </>
           ) : (
@@ -133,7 +129,7 @@ export default function AddComponent() {
               color="secondary"
               startIcon={<DeleteIcon />}
             >
-              Trash
+              Clear
             </Button>
             <Button
               variant="contained"
@@ -147,4 +143,4 @@ export default function AddComponent() {
       </AccordionDetails>
     </Accordion>
   );
-}
+};

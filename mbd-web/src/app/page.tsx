@@ -1,11 +1,10 @@
 "use client";
-import * as React from "react";
 import { AuthProvider } from "react-oidc-context";
-import Header from "./Header";
-import AddComponent from "../ui/AddComponent";
-import { Box, Container, Typography } from "@mui/material";
-import { MealHistory } from "../ui/MealHistory";
 import LoginPage from "@/ui/LoginPage";
+import { Box, Container, Typography } from "@mui/material";
+import { Header } from "./Header";
+import { AddComponent } from "@/ui/AddComponent";
+import { MealHistory } from "@/ui/MealHistory";
 
 export default function Home() {
   const cognitoAuthConfig = {
@@ -17,7 +16,7 @@ export default function Home() {
   };
 
   return (
-    <div>
+    <>
       <AuthProvider {...cognitoAuthConfig}>
         <Header />
         <Container>
@@ -31,6 +30,6 @@ export default function Home() {
           </Box>
         </Container>
       </AuthProvider>
-    </div>
+    </>
   );
 }

@@ -1,7 +1,6 @@
-import React from "react";
+import { forwardRef } from "react";
 import NextLink, { LinkProps as NextLinkProps } from "next/link";
 import MuiLink, { LinkProps as MuiLinkProps } from "@mui/material/Link";
-import { forwardRef } from "react";
 
 // Define the props type by combining Next.js LinkProps and MUI LinkProps
 type MbdLinkProps = Omit<MuiLinkProps, "href"> &

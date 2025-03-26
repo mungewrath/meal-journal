@@ -46,10 +46,12 @@ export const generateMockMeals = (days: number, offset: number) => {
           break;
       }
 
-      const foods = foodNames.map((name) => ({
-        id: (foodIdCounter++).toString(),
-        name,
-      }));
+      const foods = foodNames
+        .filter(() => Math.random() > 0.5) // Filter out some foods randomly
+        .map((name) => ({
+          id: (foodIdCounter++).toString(),
+          name,
+        }));
 
       meals.push({
         id: (mealIdCounter++).toString(),

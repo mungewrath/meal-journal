@@ -1,7 +1,7 @@
 "use client";
 
-import { Box, Typography, CircularProgress, Button, Chip } from "@mui/material";
 import { useEffect } from "react";
+import { Box, Typography, CircularProgress, Button, Chip } from "@mui/material";
 import { useAppSelector, useAppDispatch } from "@/lib/hooks";
 import { useAuth } from "react-oidc-context";
 import {
@@ -26,6 +26,7 @@ export const MealHistory = () => {
   }, [dispatch, auth, idToken]);
 
   const handleFetchMeals = () => {
+    // TODO: Extract daysLoaded logic to global state?
     const daysLoaded = new Set(
       meals.map((meal) => new Date(meal.dateTime).toDateString())
     ).size;
@@ -43,7 +44,10 @@ export const MealHistory = () => {
     } else if (date.toDateString() === yesterday.toDateString()) {
       return "Yesterday's";
     } else {
-      return `${date.getMonth() + 1}/${date.getDate()} ${date.toLocaleDateString("en-US", { weekday: "short" })}'s`;
+      return `${date.toLocaleDateString("en-US", {
+        month: "numeric",
+        day: "numeric",
+      })} ${date.toLocaleDateString("en-US", { weekday: "short" })}'s`;
     }
   };
 
@@ -53,7 +57,7 @@ export const MealHistory = () => {
   };
 
   return (
-    <Box sx={{ height: "400px", overflow: "auto" }}>
+    <Box sx={{ overflow: "auto" }}>
       {meals
         .slice()
         .sort(
@@ -61,7 +65,7 @@ export const MealHistory = () => {
             new Date(b.dateTime).getTime() - new Date(a.dateTime).getTime()
         )
         .map((meal) => (
-          <Box key={meal.id} my={2} p={2} border={1} borderRadius={2}>
+          <Box key={meal.id} my={2} p={2} border={1} borderRadius={3}>
             <Typography variant="h6">
               <span title={new Date(meal.dateTime).toLocaleDateString()}>
                 {formatDate(meal.dateTime)}
@@ -75,6 +79,7 @@ export const MealHistory = () => {
             </Box>
           </Box>
         ))}
+      {/* TODO: Test this */}
       {loading && <CircularProgress />}
       <Box display="flex" justifyContent="center" mt={2}>
         <Button onClick={handleFetchMeals} variant="contained" color="primary">

@@ -1,19 +1,14 @@
 // "use client";
 
-import * as React from "react";
-import AppBar from "@mui/material/AppBar";
-import Toolbar from "@mui/material/Toolbar";
-import IconButton from "@mui/material/IconButton";
-import Typography from "@mui/material/Typography";
-import Button from "@mui/material/Button";
+import { AppBar, Toolbar, IconButton, Typography, Button } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import { useAuth } from "react-oidc-context";
 // import { useSession, signIn, signOut } from "next-auth/react";
 
-export default function Header() {
+export const Header = () => {
   // const { data: session } = useSession();
   const auth = useAuth();
-
+    
   return (
     <AppBar position="static">
       <Toolbar>
@@ -48,4 +43,4 @@ export default function Header() {
       </Toolbar>
     </AppBar>
   );
-}
+};

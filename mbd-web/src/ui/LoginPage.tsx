@@ -1,6 +1,5 @@
 "use client";
 
-import React from "react";
 import { AuthContextProps, useAuth } from "react-oidc-context";
 import Button from "@mui/material/Button";
 

@@ -13,6 +13,11 @@ on:
         required: false
         type: boolean
         default: false
+      web_build_environment:
+        required: true
+        type: string
+        default: "stage"
+        description: "Environment to fetch UI artifacts from. Can be 'stage' or 'prod'."
 
 permissions:
   contents: read
@@ -53,7 +58,7 @@ jobs:
       - name: Download Web Build
         uses: actions/download-artifact@v4
         with:
-          name: mbd-web-build
+          name: mbd-web-build-${{ inputs.web_build_environment }}
           path: mbd-web/out
 
       - name: Download Lambda Build

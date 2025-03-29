@@ -7,13 +7,13 @@ import { useAuth } from "react-oidc-context";
 import {
   selectMeals,
   selectLoading,
-  fetchMeals,
   selectDaysLoaded,
 } from "@/lib/features/meals/mealsSlice";
 import {
   INITIAL_MEAL_DAYS_FETCHED,
   MEAL_DAYS_PER_FETCH,
 } from "@/lib/features/meals/mealsConstants";
+import { fetchMeals } from "@/lib/features/meals/requests";
 
 export const MealHistory = () => {
   const meals = useAppSelector(selectMeals);

@@ -28,12 +28,7 @@ logger.setLevel(logging.INFO)
 
 app = FastAPI(root_path="/api/v1")
 
-origins = [
-    # TODO: Fetch from environment variable
-    "http://localhost:3000",
-    "https://d1gfkxim9jw7hw.cloudfront.net",
-    "https://d1l9mogzhjoud6.cloudfront.net",
-]
+origins = os.getenv("CORS_ALLOWED_ORIGINS").split(",")
 
 app.add_middleware(
     CORSMiddleware,

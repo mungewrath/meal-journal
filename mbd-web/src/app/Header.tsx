@@ -6,7 +6,7 @@ import { useAuth } from "react-oidc-context";
 
 export const Header = () => {
   const auth = useAuth();
-    
+
   return (
     <AppBar position="static">
       <Toolbar>

@@ -2,6 +2,7 @@ import { createAppSlice } from "@/lib/createAppSlice";
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { generateMockMeals } from "./mockData";
 import axiosInstance from "@/lib/api/axios";
+import { MEAL_DAYS_PER_FETCH } from "./mealsConstants";
 
 interface Food {
   id: string;
@@ -19,11 +20,13 @@ interface Meal {
 interface MealsState {
   meals: Meal[];
   loading: boolean;
+  daysLoaded: number;
 }
 
 const initialState: MealsState = {
   meals: [],
   loading: false,
+  daysLoaded: 0,
 };
 
 export const fetchMeals = createAsyncThunk(
@@ -38,7 +41,7 @@ export const fetchMeals = createAsyncThunk(
     idToken?: string;
   }) => {
     try {
-      console.log(`idToken: ${idToken}`);
+      console.log(`Fetching meals with days: ${days}, offset: ${offset}`);
 
       const response = await axiosInstance.get(`/api/v1/meals/history`, {
         params: { days, offset },
@@ -94,6 +97,7 @@ export const mealsSlice = createAppSlice({
       .addCase(fetchMeals.fulfilled, (state, action) => {
         state.loading = false;
         state.meals = [...state.meals, ...action.payload];
+        state.daysLoaded += MEAL_DAYS_PER_FETCH;
       })
       .addCase(fetchMeals.rejected, (state) => {
         state.loading = false;
@@ -102,7 +106,9 @@ export const mealsSlice = createAppSlice({
   selectors: {
     selectMeals: (state: MealsState) => state.meals,
     selectLoading: (state: MealsState) => state.loading,
+    selectDaysLoaded: (state: MealsState) => state.daysLoaded,
   },
 });
 
-export const { selectMeals, selectLoading } = mealsSlice.selectors;
+export const { selectMeals, selectLoading, selectDaysLoaded } =
+  mealsSlice.selectors;

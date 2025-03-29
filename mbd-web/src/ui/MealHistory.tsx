@@ -8,11 +8,14 @@ import {
   selectMeals,
   selectLoading,
   fetchMeals,
+  selectDaysLoaded,
 } from "@/lib/features/meals/mealsSlice";
+import { MEAL_DAYS_PER_FETCH } from "@/lib/features/meals/mealsConstants";
 
 export const MealHistory = () => {
   const meals = useAppSelector(selectMeals);
   const loading = useAppSelector(selectLoading);
+  const daysLoaded = useAppSelector(selectDaysLoaded);
   const dispatch = useAppDispatch();
 
   const auth = useAuth();
@@ -21,16 +24,14 @@ export const MealHistory = () => {
   useEffect(() => {
     if (auth.isAuthenticated && idToken) {
       // Test data in chumpy user has meals logged 2/21 and 2/23
-      dispatch(fetchMeals({ days: 27, offset: 4, idToken }));
+      dispatch(fetchMeals({ days: MEAL_DAYS_PER_FETCH, offset: 0, idToken }));
     }
   }, [dispatch, auth, idToken]);
 
   const handleFetchMeals = () => {
-    // TODO: Extract daysLoaded logic to global state?
-    const daysLoaded = new Set(
-      meals.map((meal) => new Date(meal.dateTime).toDateString())
-    ).size;
-    dispatch(fetchMeals({ days: 1, offset: daysLoaded, idToken }));
+    dispatch(
+      fetchMeals({ days: MEAL_DAYS_PER_FETCH, offset: daysLoaded, idToken })
+    );
   };
 
   const formatDate = (dateString: string) => {
@@ -79,12 +80,33 @@ export const MealHistory = () => {
             </Box>
           </Box>
         ))}
-      {/* TODO: Test this */}
-      {loading && <CircularProgress />}
-      <Box display="flex" justifyContent="center" mt={2}>
-        <Button onClick={handleFetchMeals} variant="contained" color="primary">
-          Load More
-        </Button>
+      {loading && (
+        <Box display="flex" justifyContent="center" mt={2}>
+          <CircularProgress />
+        </Box>
+      )}
+      {!loading && (
+        <Box display="flex" justifyContent="center" mt={2}>
+          <Button
+            onClick={handleFetchMeals}
+            variant="contained"
+            color="primary"
+          >
+            Load More
+          </Button>
+        </Box>
+      )}
+      <Box display="flex" justifyContent="center" mt={1}>
+        <Typography variant="body2" color="textSecondary">
+          {daysLoaded > 0 && (
+            <>
+              Showing meals since{" "}
+              {new Date(
+                new Date().setDate(new Date().getDate() - daysLoaded)
+              ).toLocaleDateString()}
+            </>
+          )}
+        </Typography>
       </Box>
     </Box>
   );

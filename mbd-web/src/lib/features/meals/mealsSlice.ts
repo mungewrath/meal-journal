@@ -56,8 +56,7 @@ export const fetchMeals = createAsyncThunk(
       }
 
       interface ApiFood {
-        id?: string;
-        foodId?: string;
+        food_id?: string;
         name: string;
         thumbnail?: string;
       }
@@ -68,7 +67,7 @@ export const fetchMeals = createAsyncThunk(
         mealType: meal.mealType,
         dateTime: meal.dateTime,
         foods: meal.foods.map((food: ApiFood) => ({
-          id: food.id || food.foodId,
+          id: food.food_id,
           name: food.name,
           thumbnail: food.thumbnail,
         })),

@@ -13,7 +13,7 @@ import {
   INITIAL_MEAL_DAYS_FETCHED,
   MEAL_DAYS_PER_FETCH,
 } from "@/lib/features/meals/mealsConstants";
-import { fetchMeals } from "@/lib/features/meals/requests";
+import { fetchMeals } from "@/lib/features/meals/mealsApi";
 
 export const MealHistory = () => {
   const meals = useAppSelector(selectMeals);

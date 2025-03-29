@@ -1,6 +1,6 @@
 import { createAppSlice } from "@/lib/createAppSlice";
 import { MealsState } from "./models";
-import { fetchMeals } from "./requests";
+import { fetchMeals } from "./mealsApi";
 
 export const initialState: MealsState = {
   meals: [],

@@ -10,7 +10,10 @@ import {
   fetchMeals,
   selectDaysLoaded,
 } from "@/lib/features/meals/mealsSlice";
-import { MEAL_DAYS_PER_FETCH } from "@/lib/features/meals/mealsConstants";
+import {
+  INITIAL_MEAL_DAYS_FETCHED,
+  MEAL_DAYS_PER_FETCH,
+} from "@/lib/features/meals/mealsConstants";
 
 export const MealHistory = () => {
   const meals = useAppSelector(selectMeals);
@@ -24,7 +27,9 @@ export const MealHistory = () => {
   useEffect(() => {
     if (auth.isAuthenticated && idToken) {
       // Test data in chumpy user has meals logged 2/21 and 2/23
-      dispatch(fetchMeals({ days: MEAL_DAYS_PER_FETCH, offset: 0, idToken }));
+      dispatch(
+        fetchMeals({ days: INITIAL_MEAL_DAYS_FETCHED, offset: 0, idToken })
+      );
     }
   }, [dispatch, auth, idToken]);
 

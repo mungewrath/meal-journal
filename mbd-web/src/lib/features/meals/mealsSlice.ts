@@ -1,8 +1,6 @@
 import { createAppSlice } from "@/lib/createAppSlice";
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import { generateMockMeals } from "./mockData";
 import axiosInstance from "@/lib/api/axios";
-import { MEAL_DAYS_PER_FETCH } from "./mealsConstants";
 
 interface Food {
   id: string;
@@ -77,9 +75,10 @@ export const fetchMeals = createAsyncThunk(
       }));
     } catch (error) {
       console.error("Error fetching meals:", error);
+      return [];
       // Fall back to mock data on error
-      console.warn("Error fetching meals, using mock data");
-      return generateMockMeals(days, offset);
+      // console.warn("Error fetching meals, using mock data");
+      // return generateMockMeals(days, offset);
     }
   }
 );
@@ -97,7 +96,7 @@ export const mealsSlice = createAppSlice({
       .addCase(fetchMeals.fulfilled, (state, action) => {
         state.loading = false;
         state.meals = [...state.meals, ...action.payload];
-        state.daysLoaded += MEAL_DAYS_PER_FETCH;
+        state.daysLoaded += action.meta.arg.days;
       })
       .addCase(fetchMeals.rejected, (state) => {
         state.loading = false;

@@ -1,7 +1,6 @@
 import { createAppSlice } from "@/lib/createAppSlice";
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import { generateMockMeals } from "./mockData";
-// import axios from "axios";
+import axiosInstance from "@/lib/api/axios";
 
 interface Food {
   id: string;
@@ -19,20 +18,67 @@ interface Meal {
 interface MealsState {
   meals: Meal[];
   loading: boolean;
+  daysLoaded: number;
 }
 
 const initialState: MealsState = {
   meals: [],
   loading: false,
+  daysLoaded: 0,
 };
 
-// Commenting out the API call and using mock data instead
 export const fetchMeals = createAsyncThunk(
   "meals/fetchMeals",
-  async ({ days, offset }: { days: number; offset: number }) => {
-    // const response = await axios.get(`/api/meals/history?days=${days}&offset=${offset}`);
-    // return response.data;
-    return generateMockMeals(days, offset);
+  async ({
+    days,
+    offset,
+    idToken,
+  }: {
+    days: number;
+    offset: number;
+    idToken?: string;
+  }) => {
+    try {
+      console.log(`Fetching meals with days: ${days}, offset: ${offset}`);
+
+      const response = await axiosInstance.get(`/api/v1/meals/history`, {
+        params: { days, offset },
+        headers: {
+          Authorization: `Bearer ${idToken}`,
+        },
+      });
+
+      // Define types for API response
+      interface ApiMeal {
+        mealType: string;
+        dateTime: string;
+        foods: ApiFood[];
+      }
+
+      interface ApiFood {
+        food_id?: string;
+        name: string;
+        thumbnail?: string;
+      }
+
+      // Transform the response to match the expected format
+      return response.data.map((meal: ApiMeal) => ({
+        id: `${meal.mealType}-${meal.dateTime}`, // Generate an ID since backend doesn't provide one
+        mealType: meal.mealType,
+        dateTime: meal.dateTime,
+        foods: meal.foods.map((food: ApiFood) => ({
+          id: food.food_id,
+          name: food.name,
+          thumbnail: food.thumbnail,
+        })),
+      }));
+    } catch (error) {
+      console.error("Error fetching meals:", error);
+      return [];
+      // Fall back to mock data on error
+      // console.warn("Error fetching meals, using mock data");
+      // return generateMockMeals(days, offset);
+    }
   }
 );
 
@@ -49,6 +95,7 @@ export const mealsSlice = createAppSlice({
       .addCase(fetchMeals.fulfilled, (state, action) => {
         state.loading = false;
         state.meals = [...state.meals, ...action.payload];
+        state.daysLoaded += action.meta.arg.days;
       })
       .addCase(fetchMeals.rejected, (state) => {
         state.loading = false;
@@ -57,7 +104,9 @@ export const mealsSlice = createAppSlice({
   selectors: {
     selectMeals: (state: MealsState) => state.meals,
     selectLoading: (state: MealsState) => state.loading,
+    selectDaysLoaded: (state: MealsState) => state.daysLoaded,
   },
 });
 
-export const { selectMeals, selectLoading } = mealsSlice.selectors;
+export const { selectMeals, selectLoading, selectDaysLoaded } =
+  mealsSlice.selectors;

@@ -10,9 +10,3 @@ export interface Meal {
   dateTime: string;
   foods: Food[];
 }
-
-export interface MealsState {
-  meals: Meal[];
-  loading: boolean;
-  daysLoaded: number;
-}

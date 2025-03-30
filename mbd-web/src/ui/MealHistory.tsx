@@ -13,7 +13,7 @@ import {
   INITIAL_MEAL_DAYS_FETCHED,
   MEAL_DAYS_PER_FETCH,
 } from "@/lib/features/meals/mealsConstants";
-import { fetchMeals } from "@/lib/features/meals/mealsApi";
+import { fetchMeals } from "@/lib/features/meals/mealsSlice";
 
 export const MealHistory = () => {
   const meals = useAppSelector(selectMeals);
@@ -33,9 +33,14 @@ export const MealHistory = () => {
     }
   }, [dispatch, auth, idToken]);
 
+  // TODO: Currently assumes that the day does not change. If you reload the page at midnight, you end up with incorrect results
   const handleFetchMeals = () => {
     dispatch(
-      fetchMeals({ days: MEAL_DAYS_PER_FETCH, offset: daysLoaded, idToken })
+      fetchMeals({
+        days: MEAL_DAYS_PER_FETCH,
+        offset: daysLoaded,
+        idToken: idToken!,
+      })
     );
   };
 

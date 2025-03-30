@@ -1,8 +1,22 @@
 import { createAppSlice } from "@/lib/createAppSlice";
-import { MealsState } from "./models";
-import { fetchMeals } from "./mealsApi";
+import { createAsyncThunk } from "@reduxjs/toolkit";
+import { Meal } from "./models";
+import { fetchMealsApi, FetchMealsParams } from "@/lib/api/fetchMeals";
 
-export const initialState: MealsState = {
+export const fetchMeals = createAsyncThunk(
+  "meals/fetchMeals",
+  async (params: FetchMealsParams) => {
+    return fetchMealsApi(params);
+  }
+);
+
+export interface MealsState {
+  meals: Meal[];
+  loading: boolean;
+  daysLoaded: number;
+}
+
+const initialState: MealsState = {
   meals: [],
   loading: false,
   daysLoaded: 0,

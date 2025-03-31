@@ -37,7 +37,7 @@ app.add_middleware(
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
-    expose_headers=["*"],
+    expose_headers=["access-control-allow-origin"],
 )
 
 # Used when API Gateway/lambda is deployed

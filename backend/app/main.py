@@ -29,6 +29,7 @@ logger.setLevel(logging.INFO)
 app = FastAPI(root_path="/api/v1")
 
 origins = os.getenv("CORS_ALLOWED_ORIGINS").split(",")
+logger.info("CORS_ALLOWED_ORIGINS: %s", origins)
 
 app.add_middleware(
     CORSMiddleware,
@@ -36,6 +37,7 @@ app.add_middleware(
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
+    expose_headers=["*"],
 )
 
 # Used when API Gateway/lambda is deployed

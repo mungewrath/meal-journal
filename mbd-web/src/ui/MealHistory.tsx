@@ -110,7 +110,7 @@ export const MealHistory = () => {
         <Typography variant="body2" color="textSecondary">
           {daysLoaded > 0 && (
             <>
-              Showing meals since{" "}
+              Showing meals since&nbsp;
               {new Date(
                 new Date().setDate(new Date().getDate() - daysLoaded)
               ).toLocaleDateString()}

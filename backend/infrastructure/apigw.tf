@@ -16,7 +16,7 @@ resource "aws_api_gateway_resource" "proxy" {
 resource "aws_api_gateway_method" "proxy" {
   rest_api_id   = aws_api_gateway_rest_api.mbd_rest_api.id
   resource_id   = aws_api_gateway_resource.proxy.id
-  http_method   = "GET" # Accept all HTTP methods
+  http_method   = "ANY" # Accept all HTTP methods
   authorization = "COGNITO_USER_POOLS"
   authorizer_id = aws_api_gateway_authorizer.cognito.id
 
@@ -46,19 +46,6 @@ resource "aws_api_gateway_integration" "proxy" {
     "integration.request.path.proxy" = "method.request.path.proxy"
   }
 }
-
-# resource "aws_api_gateway_method_response" "proxy" {
-#   rest_api_id = aws_api_gateway_rest_api.mbd_rest_api.id
-#   resource_id = aws_api_gateway_resource.proxy.id
-#   http_method = aws_api_gateway_method.proxy.http_method
-#   status_code = "200"
-
-#   response_parameters = {
-#     "method.response.header.Access-Control-Allow-Origin"  = true
-#     "method.response.header.Access-Control-Allow-Methods" = true
-#     "method.response.header.Access-Control-Allow-Headers" = true
-#   }
-# }
 
 # Integration for OPTIONS
 resource "aws_api_gateway_integration" "proxy_options" {
@@ -116,7 +103,12 @@ resource "aws_api_gateway_deployment" "main" {
   rest_api_id = aws_api_gateway_rest_api.mbd_rest_api.id
 
   triggers = {
-    redeployment = sha1(jsonencode(aws_api_gateway_rest_api.mbd_rest_api.body))
+    redeployment = sha1(jsonencode({
+      rest_api_id  = aws_api_gateway_rest_api.mbd_rest_api.id
+      resources    = aws_api_gateway_resource.proxy.id
+      methods      = [aws_api_gateway_method.proxy.http_method, aws_api_gateway_method.proxy_options.http_method]
+      integrations = aws_api_gateway_integration.proxy.uri
+    }))
   }
 
   lifecycle {

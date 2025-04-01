@@ -107,7 +107,7 @@ resource "aws_api_gateway_deployment" "main" {
       rest_api_id  = aws_api_gateway_rest_api.mbd_rest_api.id
       resources    = aws_api_gateway_resource.proxy.id
       methods      = [aws_api_gateway_method.proxy.http_method, aws_api_gateway_method.proxy_options.http_method]
-      integrations = aws_api_gateway_integration.proxy.uri
+      integrations = [aws_api_gateway_integration.proxy.uri, aws_api_gateway_integration.proxy_options.uri]
     }))
   }
 

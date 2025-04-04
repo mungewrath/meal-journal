@@ -65,7 +65,7 @@ resource "aws_api_gateway_integration_response" "proxy" {
 
 # API Gateway Deployment
 resource "aws_api_gateway_deployment" "main" {
-  depends_on  = [
+  depends_on = [
     aws_api_gateway_integration.proxy,
     aws_api_gateway_integration_response.proxy
   ]

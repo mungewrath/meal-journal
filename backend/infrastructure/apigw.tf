@@ -39,9 +39,36 @@ resource "aws_api_gateway_integration" "proxy" {
   }
 }
 
+# API Gateway Method Response
+resource "aws_api_gateway_method_response" "proxy" {
+  rest_api_id = aws_api_gateway_rest_api.mbd_rest_api.id
+  resource_id = aws_api_gateway_resource.proxy.id
+  http_method = aws_api_gateway_method.proxy.http_method
+  status_code = "200"
+
+  response_models = {
+    "application/json" = "Empty"
+  }
+}
+
+# API Gateway Integration Response
+resource "aws_api_gateway_integration_response" "proxy" {
+  rest_api_id = aws_api_gateway_rest_api.mbd_rest_api.id
+  resource_id = aws_api_gateway_resource.proxy.id
+  http_method = aws_api_gateway_method.proxy.http_method
+  status_code = aws_api_gateway_method_response.proxy.status_code
+
+  response_templates = {
+    "application/json" = ""
+  }
+}
+
 # API Gateway Deployment
 resource "aws_api_gateway_deployment" "main" {
-  depends_on  = [aws_api_gateway_integration.proxy]
+  depends_on  = [
+    aws_api_gateway_integration.proxy,
+    aws_api_gateway_integration_response.proxy
+  ]
   rest_api_id = aws_api_gateway_rest_api.mbd_rest_api.id
 
   triggers = {

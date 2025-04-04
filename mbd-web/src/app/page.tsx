@@ -16,20 +16,18 @@ export default function Home() {
   };
 
   return (
-    <>
-      <AuthProvider {...cognitoAuthConfig}>
-        <Header />
-        <Container>
-          <Box my={2}>
-            <Typography variant="h4" component="h1" gutterBottom>
-              Welcome to My Belly&apos;s Diary
-            </Typography>
-            <LoginPage />
-            <AddComponent />
-            <MealHistory />
-          </Box>
-        </Container>
-      </AuthProvider>
-    </>
+    <AuthProvider {...cognitoAuthConfig}>
+      <Header />
+      <Container>
+        <Box my={2}>
+          <Typography variant="h4" component="h1" gutterBottom>
+            Welcome to My Belly&apos;s Diary
+          </Typography>
+          <LoginPage />
+          <AddComponent />
+          <MealHistory />
+        </Box>
+      </Container>
+    </AuthProvider>
   );
 }

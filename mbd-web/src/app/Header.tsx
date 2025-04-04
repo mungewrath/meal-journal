@@ -11,7 +11,7 @@ export const Header = () => {
       await auth.removeUser();
 
       // Redirect to the Cognito logout endpoint
-      const logoutUrl = `${process.env.NEXT_PUBLIC_COGNITO_DOMAIN}/logout?client_id=${process.env.NEXT_PUBLIC_COGNITO_CLIENT_ID}&logout_uri=${encodeURIComponent(
+      const logoutUrl = `${process.env.NEXT_PUBLIC_COGNITO_DOMAIN}/logout?client_id=${process.env.NEXT_PUBLIC_COGNITO_CLIENT_ID}&redirect_uri=${encodeURIComponent(
         process.env.NEXT_PUBLIC_COGNITO_REDIRECT as string
       )}`;
       window.location.href = logoutUrl;

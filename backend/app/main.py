@@ -7,6 +7,7 @@ import traceback
 
 from fastapi import FastAPI, Header, Request
 from fastapi.responses import JSONResponse
+from fastapi.middleware.cors import CORSMiddleware
 from mangum import Mangum
 from dto.food_create import FoodCreate
 from dto.meal_create import MealCreate
@@ -26,6 +27,18 @@ logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
 app = FastAPI(root_path="/api/v1")
+
+origins = os.getenv("CORS_ALLOWED_ORIGINS").split(",")
+logger.info("CORS_ALLOWED_ORIGINS: %s", origins)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+    expose_headers=["access-control-allow-origin"],
+)
 
 # Used when API Gateway/lambda is deployed
 handler = Mangum(app, lifespan="off", api_gateway_base_path="/api/v1")
@@ -63,7 +76,7 @@ async def root() -> str:
 
 @app.get("/preferences")
 async def get_preferences(
-    authorization: Annotated[str | None, Header()] = None
+    authorization: Annotated[str | None, Header()] = None,
 ) -> dict:
     user_id = get_user_id(authorization)
 

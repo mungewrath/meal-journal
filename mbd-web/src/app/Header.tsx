@@ -10,11 +10,15 @@ export const Header = () => {
       // Clear the local session
       await auth.removeUser();
 
-      // Redirect to the Cognito logout endpoint
+      // Create the Cognito logout URL with all required parameters
       const logoutUrl = `${process.env.NEXT_PUBLIC_COGNITO_DOMAIN}/logout?client_id=${process.env.NEXT_PUBLIC_COGNITO_CLIENT_ID}&response_type=code&redirect_uri=${encodeURIComponent(
         process.env.NEXT_PUBLIC_COGNITO_REDIRECT as string
+      )}&logout_uri=${encodeURIComponent(
+        process.env.NEXT_PUBLIC_COGNITO_REDIRECT as string
       )}`;
-      window.location.href = logoutUrl;
+
+      // Use replace to avoid opening in a new tab
+      window.location.replace(logoutUrl);
     } catch (error) {
       console.error("Logout failed:", error);
     }

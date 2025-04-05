@@ -57,16 +57,6 @@ resource "aws_api_gateway_integration" "proxy_options" {
   request_templates = {
     "application/json" = "{\"statusCode\": 200}"
   }
-
-  # response_parameters = {
-  #   "method.response.header.Access-Control-Allow-Origin"  = "'*'"
-  #   "method.response.header.Access-Control-Allow-Methods" = "'GET,POST,PUT,DELETE,OPTIONS'"
-  #   "method.response.header.Access-Control-Allow-Headers" = "'Content-Type,Authorization'"
-  # }
-
-  # response_templates = {
-  #   "application/json" = ""
-  # }
 }
 
 # Response for OPTIONS

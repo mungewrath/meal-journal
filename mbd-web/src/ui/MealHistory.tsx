@@ -8,12 +8,12 @@ import {
   selectMeals,
   selectLoading,
   selectDaysLoaded,
+  fetchMeals,
 } from "@/lib/features/meals/mealsSlice";
 import {
   INITIAL_MEAL_DAYS_FETCHED,
   MEAL_DAYS_PER_FETCH,
 } from "@/lib/features/meals/mealsConstants";
-import { fetchMeals } from "@/lib/features/meals/mealsSlice";
 
 export const MealHistory = () => {
   const meals = useAppSelector(selectMeals);
@@ -85,7 +85,10 @@ export const MealHistory = () => {
             </Typography>
             <Box mt={1} display="flex" flexWrap="wrap" gap={1}>
               {meal.foods.map((food) => (
-                <Chip key={food.id} label={`${food.name} ${food.thumbnail}`} />
+                <Chip
+                  key={food.id}
+                  label={`${food.name} ${food.thumbnail}`.trim()}
+                />
               ))}
             </Box>
           </Box>

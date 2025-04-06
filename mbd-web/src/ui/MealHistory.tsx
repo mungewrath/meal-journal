@@ -3,27 +3,45 @@
 import { useEffect } from "react";
 import { Box, Typography, CircularProgress, Button, Chip } from "@mui/material";
 import { useAppSelector, useAppDispatch } from "@/lib/hooks";
+import { useAuth } from "react-oidc-context";
 import {
   selectMeals,
   selectLoading,
+  selectDaysLoaded,
   fetchMeals,
 } from "@/lib/features/meals/mealsSlice";
+import {
+  INITIAL_MEAL_DAYS_FETCHED,
+  MEAL_DAYS_PER_FETCH,
+} from "@/lib/features/meals/mealsConstants";
 
 export const MealHistory = () => {
   const meals = useAppSelector(selectMeals);
   const loading = useAppSelector(selectLoading);
+  const daysLoaded = useAppSelector(selectDaysLoaded);
   const dispatch = useAppDispatch();
 
-  useEffect(() => {
-    dispatch(fetchMeals({ days: 3, offset: 0 }));
-  }, [dispatch]);
+  const auth = useAuth();
+  const idToken = auth.isAuthenticated ? auth.user?.id_token : undefined;
 
+  useEffect(() => {
+    if (auth.isAuthenticated && idToken) {
+      // Test data in chumpy user has meals logged 2/21 and 2/23
+      dispatch(
+        fetchMeals({ days: INITIAL_MEAL_DAYS_FETCHED, offset: 0, idToken })
+      );
+    }
+  }, [dispatch, auth, idToken]);
+
+  // TODO: Currently assumes that the day does not change. If you reload the page at midnight, you end up with incorrect results
   const handleFetchMeals = () => {
-    // TODO: Extract daysLoaded logic to global state?
-    const daysLoaded = new Set(
-      meals.map((meal) => new Date(meal.dateTime).toDateString())
-    ).size;
-    dispatch(fetchMeals({ days: 1, offset: daysLoaded }));
+    dispatch(
+      fetchMeals({
+        days: MEAL_DAYS_PER_FETCH,
+        offset: daysLoaded,
+        idToken: idToken!,
+      })
+    );
   };
 
   const formatDate = (dateString: string) => {
@@ -67,17 +85,41 @@ export const MealHistory = () => {
             </Typography>
             <Box mt={1} display="flex" flexWrap="wrap" gap={1}>
               {meal.foods.map((food) => (
-                <Chip key={food.id} label={food.name} />
+                <Chip
+                  key={food.id}
+                  label={`${food.name} ${food.thumbnail}`.trim()}
+                />
               ))}
             </Box>
           </Box>
         ))}
-      {/* TODO: Test this */}
-      {loading && <CircularProgress />}
-      <Box display="flex" justifyContent="center" mt={2}>
-        <Button onClick={handleFetchMeals} variant="contained" color="primary">
-          Load More
-        </Button>
+      {loading && (
+        <Box display="flex" justifyContent="center" mt={2}>
+          <CircularProgress />
+        </Box>
+      )}
+      {!loading && (
+        <Box display="flex" justifyContent="center" mt={2}>
+          <Button
+            onClick={handleFetchMeals}
+            variant="contained"
+            color="primary"
+          >
+            Load More
+          </Button>
+        </Box>
+      )}
+      <Box display="flex" justifyContent="center" mt={1}>
+        <Typography variant="body2" color="textSecondary">
+          {daysLoaded > 0 && (
+            <>
+              Showing meals since&nbsp;
+              {new Date(
+                new Date().setDate(new Date().getDate() - daysLoaded)
+              ).toLocaleDateString()}
+            </>
+          )}
+        </Typography>
       </Box>
     </Box>
   );

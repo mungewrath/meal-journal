@@ -52,6 +52,7 @@ resource "aws_cognito_user_pool_client" "mj_user_pool_client" {
   allowed_oauth_flows                  = ["code"]
   allowed_oauth_scopes                 = ["phone", "email", "openid", "profile"]
   callback_urls                        = ["http://localhost:3000", "https://${aws_cloudfront_distribution.mbd_web_distribution.domain_name}"]
+  logout_urls                          = ["http://localhost:3000", "https://${aws_cloudfront_distribution.mbd_web_distribution.domain_name}"]
   supported_identity_providers         = ["COGNITO"]
 }
 

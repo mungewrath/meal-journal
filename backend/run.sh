@@ -1,4 +1,6 @@
 #!/bin/bash -x
 
-export PYTHONPATH=./app
+export PYTHONPATH=.
+export ENVIRONMENT=dev
+cd app
 uv run fastapi dev

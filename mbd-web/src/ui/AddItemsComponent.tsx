@@ -145,11 +145,14 @@ export const AddItemsComponent = ({
         handleHomeEndKeys
         autoComplete
         autoSelect
-        renderOption={(props, option) => (
-          <li {...props}>
-            {option.isNew ? `Add "${option.inputValue}"` : option.name}
-          </li>
-        )}
+        renderOption={(props, option) => {
+          const { key, ...otherProps } = props;
+          return (
+            <li key={key} {...otherProps}>
+              {option.isNew ? `Add "${option.inputValue}"` : option.name}
+            </li>
+          );
+        }}
         renderInput={(params) => (
           <TextField
             {...params}

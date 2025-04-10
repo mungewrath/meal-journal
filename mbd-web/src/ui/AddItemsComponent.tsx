@@ -36,7 +36,7 @@ const placeholderItems: Record<string, Item[]> = {
 };
 
 interface AddItemsComponentProps {
-  value: Item[];
+  items: Item[];
   onChange: (items: Item[]) => void;
   disabled?: boolean;
   placeholder?: string;
@@ -47,7 +47,7 @@ interface AddItemsComponentProps {
 const filter = createFilterOptions<Item>();
 
 export const AddItemsComponent = ({
-  value,
+  items,
   onChange,
   disabled = false,
   placeholder = "Type to search...",
@@ -59,12 +59,12 @@ export const AddItemsComponent = ({
   const autocompleteRef = useRef<typeof Autocomplete>(null);
 
   const handleDelete = (itemToDelete: Item) => () => {
-    onChange(value.filter((item) => item.id !== itemToDelete.id));
+    onChange(items.filter((item) => item.id !== itemToDelete.id));
   };
 
   // Filter out already selected items from options
   const getFilteredOptions = () => {
-    const selectedIds = new Set(value.map((item) => item.id));
+    const selectedIds = new Set(items.map((item) => item.id));
     return placeholderItems[type].filter((item) => !selectedIds.has(item.id));
   };
 
@@ -80,8 +80,8 @@ export const AddItemsComponent = ({
       // If there's only one option (either existing or new), select it
       if (filtered.length === 1) {
         const option = filtered[0];
-        if (!value.some((item) => item.id === option.id)) {
-          onChange([...value, option]);
+        if (!items.some((item) => item.id === option.id)) {
+          onChange([...items, option]);
           setInputValue("");
           setOpen(false);
         }
@@ -98,7 +98,7 @@ export const AddItemsComponent = ({
         onClose={() => setOpen(false)}
         disabled={disabled}
         multiple
-        value={value}
+        value={items}
         onChange={(_, newValue) => {
           onChange(newValue);
           setOpen(false);
@@ -122,9 +122,13 @@ export const AddItemsComponent = ({
           const isExisting = options.some(
             (option) => option.name.toLowerCase() === inputValue.toLowerCase()
           );
+          // Check if the input matches any selected item (case insensitive)
+          const isSelected = items.some(
+            (item) => item.name.toLowerCase() === inputValue.toLowerCase()
+          );
 
-          // Only suggest creating a new value if it doesn't match any existing item
-          if (inputValue !== "" && !isExisting) {
+          // Only suggest creating a new value if it doesn't match any existing or selected item
+          if (inputValue !== "" && !isExisting && !isSelected) {
             filtered.push({
               name: inputValue,
               id: `new-${inputValue}`,
@@ -158,7 +162,7 @@ export const AddItemsComponent = ({
         renderTags={() => null} // Hide the default tags
       />
       <Box sx={{ display: "flex", flexWrap: "wrap", gap: 1 }}>
-        {value.map((item) => (
+        {items.map((item) => (
           <Chip
             key={item.id}
             label={item.name}

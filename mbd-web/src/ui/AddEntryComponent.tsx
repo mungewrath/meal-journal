@@ -196,7 +196,7 @@ export const AddEntryComponent = () => {
                 </Select>
               </FormControl>
               <AddItemsComponent
-                value={selectedItems}
+                items={selectedItems}
                 onChange={setSelectedItems}
                 disabled={saving}
                 placeholder="Search for foods or add a new one..."
@@ -205,7 +205,7 @@ export const AddEntryComponent = () => {
             </>
           ) : (
             <AddItemsComponent
-              value={selectedItems}
+              items={selectedItems}
               onChange={setSelectedItems}
               disabled={saving}
               placeholder="Search for symptoms or add a new one..."

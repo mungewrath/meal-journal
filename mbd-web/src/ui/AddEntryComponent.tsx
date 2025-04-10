@@ -199,7 +199,7 @@ export const AddEntryComponent = () => {
                 value={selectedItems}
                 onChange={setSelectedItems}
                 disabled={saving}
-                placeholder="Type to search for foods..."
+                placeholder="Search for foods or add a new one..."
                 label="Food"
               />
             </>
@@ -208,7 +208,7 @@ export const AddEntryComponent = () => {
               value={selectedItems}
               onChange={setSelectedItems}
               disabled={saving}
-              placeholder="Type to search for symptoms..."
+              placeholder="Search for symptoms or add a new one..."
               label="Symptom"
             />
           )}

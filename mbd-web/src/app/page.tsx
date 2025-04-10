@@ -13,6 +13,9 @@ export default function Home() {
     redirect_uri: process.env.NEXT_PUBLIC_COGNITO_REDIRECT,
     response_type: "code",
     scope: "openid profile email",
+    automaticSilentRenew: true,
+    silent_redirect_uri: process.env.NEXT_PUBLIC_COGNITO_REDIRECT,
+    accessTokenExpiringNotificationTimeInSeconds: 2 * 24 * 60 * 60,
   };
 
   return (

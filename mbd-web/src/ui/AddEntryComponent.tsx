@@ -75,7 +75,6 @@ export const AddEntryComponent = () => {
     setDate(new Date().toISOString().split("T")[0]);
     setTime("");
     setSelectedItems([]);
-    dispatch(clearError());
   };
 
   const handleSave = async () => {
@@ -98,6 +97,10 @@ export const AddEntryComponent = () => {
           idToken: auth.user.id_token,
         })
       );
+
+      if (!error) {
+        handleClear();
+      }
     } else {
       // TODO: Implement symptom saving
       console.log("Saving symptom:", { entryName, date, time, selectedItems });

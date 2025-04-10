@@ -24,9 +24,9 @@ import { AddItemsComponent } from "@/ui/AddItemsComponent";
 import { useAppDispatch, useAppSelector } from "@/lib/hooks";
 import {
   saveMeal,
-  clearError,
+  clearSaveError,
   selectSaving,
-  selectError,
+  selectSaveError,
 } from "@/lib/features/meals/mealsSlice";
 import { useAuth } from "react-oidc-context";
 
@@ -39,7 +39,7 @@ export const AddEntryComponent = () => {
   const dispatch = useAppDispatch();
   const auth = useAuth();
   const saving = useAppSelector(selectSaving);
-  const error = useAppSelector(selectError);
+  const saveError = useAppSelector(selectSaveError);
   const [entryName, setEntryName] = useState("");
   const [date, setDate] = useState("");
   const [time, setTime] = useState("");
@@ -98,7 +98,7 @@ export const AddEntryComponent = () => {
         })
       );
 
-      if (!error) {
+      if (!saveError) {
         handleClear();
       }
     } else {
@@ -129,9 +129,9 @@ export const AddEntryComponent = () => {
           component="form"
           sx={{ display: "flex", flexDirection: "column", gap: 2 }}
         >
-          {error && (
-            <Alert severity="error" onClose={() => dispatch(clearError())}>
-              {error}
+          {saveError && (
+            <Alert severity="error" onClose={() => dispatch(clearSaveError())}>
+              {saveError}
             </Alert>
           )}
           <Box sx={{ display: "flex", justifyContent: "space-between" }}>

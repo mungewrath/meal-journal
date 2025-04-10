@@ -23,7 +23,8 @@ interface MealsState {
   loading: boolean;
   daysLoaded: number;
   saving: boolean;
-  error: string | null;
+  saveError: string | null;
+  loadError: string | null;
 }
 
 const initialState: MealsState = {
@@ -31,15 +32,19 @@ const initialState: MealsState = {
   loading: false,
   daysLoaded: 0,
   saving: false,
-  error: null,
+  saveError: null,
+  loadError: null,
 };
 
 export const mealsSlice = createAppSlice({
   name: "meals",
   initialState,
   reducers: (create) => ({
-    clearError: create.reducer((state) => {
-      state.error = null;
+    clearSaveError: create.reducer((state) => {
+      state.saveError = null;
+    }),
+    clearLoadError: create.reducer((state) => {
+      state.loadError = null;
     }),
   }),
   extraReducers: (builder) => {
@@ -52,12 +57,13 @@ export const mealsSlice = createAppSlice({
         state.meals = [...state.meals, ...action.payload];
         state.daysLoaded += action.meta.arg.days;
       })
-      .addCase(fetchMeals.rejected, (state) => {
+      .addCase(fetchMeals.rejected, (state, action) => {
         state.loading = false;
+        state.loadError = action.error.message || "Failed to fetch meals";
       })
       .addCase(saveMeal.pending, (state) => {
         state.saving = true;
-        state.error = null;
+        state.saveError = null;
       })
       .addCase(saveMeal.fulfilled, (state, action) => {
         state.saving = false;
@@ -65,7 +71,7 @@ export const mealsSlice = createAppSlice({
       })
       .addCase(saveMeal.rejected, (state, action) => {
         state.saving = false;
-        state.error = action.error.message || "Failed to save meal";
+        state.saveError = action.error.message || "Failed to save meal";
       });
   },
   selectors: {
@@ -73,7 +79,8 @@ export const mealsSlice = createAppSlice({
     selectLoading: (state: MealsState) => state.loading,
     selectDaysLoaded: (state: MealsState) => state.daysLoaded,
     selectSaving: (state: MealsState) => state.saving,
-    selectError: (state: MealsState) => state.error,
+    selectSaveError: (state: MealsState) => state.saveError,
+    selectLoadError: (state: MealsState) => state.loadError,
   },
 });
 
@@ -82,7 +89,8 @@ export const {
   selectLoading,
   selectDaysLoaded,
   selectSaving,
-  selectError,
+  selectSaveError,
+  selectLoadError,
 } = mealsSlice.selectors;
 
-export const { clearError } = mealsSlice.actions;
+export const { clearSaveError, clearLoadError } = mealsSlice.actions;

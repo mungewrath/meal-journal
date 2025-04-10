@@ -11,6 +11,7 @@ import {
   InputLabel,
   Button,
   CircularProgress,
+  Alert,
 } from "@mui/material";
 import { SelectChangeEvent } from "@mui/material/Select";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
@@ -20,6 +21,14 @@ import RestaurantIcon from "@mui/icons-material/Restaurant";
 import HealingIcon from "@mui/icons-material/Healing";
 import { useState, useEffect } from "react";
 import { AddItemsComponent } from "@/ui/AddItemsComponent";
+import { useAppDispatch, useAppSelector } from "@/lib/hooks";
+import {
+  saveMeal,
+  clearError,
+  selectSaving,
+  selectError,
+} from "@/lib/features/meals/mealsSlice";
+import { useAuth } from "react-oidc-context";
 
 interface Item {
   id: string;
@@ -27,13 +36,16 @@ interface Item {
 }
 
 export const AddEntryComponent = () => {
+  const dispatch = useAppDispatch();
+  const auth = useAuth();
+  const saving = useAppSelector(selectSaving);
+  const error = useAppSelector(selectError);
   const [entryName, setEntryName] = useState("");
   const [date, setDate] = useState("");
   const [time, setTime] = useState("");
   const [selectedOption, setSelectedOption] = useState("meal");
   const [expanded, setExpanded] = useState(true);
   const [selectedItems, setSelectedItems] = useState<Item[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
 
   const handleEntryNameChange = (event: SelectChangeEvent<string>) => {
     setEntryName(event.target.value as string);
@@ -63,18 +75,32 @@ export const AddEntryComponent = () => {
     setDate(new Date().toISOString().split("T")[0]);
     setTime("");
     setSelectedItems([]);
+    dispatch(clearError());
   };
 
   const handleSave = async () => {
-    setIsLoading(true);
-    try {
-      // TODO: Replace with actual API call
-      await new Promise((resolve) => setTimeout(resolve, 1000)); // Simulated API call
-      handleClear();
-    } catch (error) {
-      console.error("Error saving entry:", error);
-    } finally {
-      setIsLoading(false);
+    if (!auth.user?.id_token) {
+      console.error("No ID token available");
+      return;
+    }
+
+    if (selectedOption === "meal") {
+      const dateTime = `${date}T${time || "00:00"}`;
+      dispatch(
+        saveMeal({
+          meal: {
+            mealType: entryName,
+            dateTime,
+            foods: selectedItems.map((item) => ({
+              name: item.name,
+            })),
+          },
+          idToken: auth.user.id_token,
+        })
+      );
+    } else {
+      // TODO: Implement symptom saving
+      console.log("Saving symptom:", { entryName, date, time, selectedItems });
     }
   };
 
@@ -100,13 +126,18 @@ export const AddEntryComponent = () => {
           component="form"
           sx={{ display: "flex", flexDirection: "column", gap: 2 }}
         >
+          {error && (
+            <Alert severity="error" onClose={() => dispatch(clearError())}>
+              {error}
+            </Alert>
+          )}
           <Box sx={{ display: "flex", justifyContent: "space-between" }}>
             <Button
               variant={selectedOption === "meal" ? "contained" : "outlined"}
               startIcon={<RestaurantIcon />}
               onClick={() => handleOptionChange("meal")}
               sx={{ flexGrow: 1, mr: 1 }}
-              disabled={isLoading}
+              disabled={saving}
             >
               Meal
             </Button>
@@ -115,7 +146,7 @@ export const AddEntryComponent = () => {
               startIcon={<HealingIcon />}
               onClick={() => handleOptionChange("symptom")}
               sx={{ flexGrow: 1, ml: 1 }}
-              disabled={isLoading}
+              disabled={saving}
             >
               Symptom
             </Button>
@@ -134,7 +165,7 @@ export const AddEntryComponent = () => {
               onChange={handleDateChange}
               slotProps={{ inputLabel: { shrink: true } }}
               sx={{ flexGrow: 1 }}
-              disabled={isLoading}
+              disabled={saving}
             />
             <TextField
               label="Time"
@@ -143,7 +174,7 @@ export const AddEntryComponent = () => {
               onChange={handleTimeChange}
               slotProps={{ inputLabel: { shrink: true } }}
               sx={{ flexGrow: 1 }}
-              disabled={isLoading}
+              disabled={saving}
             />
           </Box>
           {selectedOption === "meal" ? (
@@ -153,7 +184,7 @@ export const AddEntryComponent = () => {
                 <Select
                   value={entryName}
                   onChange={handleEntryNameChange}
-                  disabled={isLoading}
+                  disabled={saving}
                 >
                   <MenuItem value="Breakfast">Breakfast</MenuItem>
                   <MenuItem value="Lunch">Lunch</MenuItem>
@@ -164,7 +195,7 @@ export const AddEntryComponent = () => {
               <AddItemsComponent
                 value={selectedItems}
                 onChange={setSelectedItems}
-                disabled={isLoading}
+                disabled={saving}
                 placeholder="Type to search for foods..."
                 label="Food"
               />
@@ -173,7 +204,7 @@ export const AddEntryComponent = () => {
             <AddItemsComponent
               value={selectedItems}
               onChange={setSelectedItems}
-              disabled={isLoading}
+              disabled={saving}
               placeholder="Type to search for symptoms..."
               label="Symptom"
             />
@@ -184,20 +215,20 @@ export const AddEntryComponent = () => {
               color="secondary"
               startIcon={<DeleteIcon />}
               onClick={handleClear}
-              disabled={isLoading}
+              disabled={saving}
             >
               Clear
             </Button>
             <Button
               variant="contained"
               color="primary"
-              startIcon={
-                isLoading ? <CircularProgress size={20} /> : <SaveIcon />
-              }
+              startIcon={saving ? <CircularProgress size={20} /> : <SaveIcon />}
               onClick={handleSave}
-              disabled={isLoading}
+              disabled={
+                saving || !entryName || !date || selectedItems.length === 0
+              }
             >
-              {isLoading ? "Saving..." : "Save"}
+              {saving ? "Saving..." : "Save"}
             </Button>
           </Box>
         </Box>

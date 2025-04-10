@@ -12,7 +12,6 @@ import DeleteIcon from "@mui/icons-material/Delete";
 interface Item {
   id: string;
   name: string;
-  inputValue?: string;
   isNew?: boolean;
 }
 
@@ -110,12 +109,8 @@ export const AddItemsComponent = ({
         }}
         options={getFilteredOptions()}
         getOptionLabel={(option) => {
-          // For value objects with inputValue, return the inputValue
-          if (typeof option === "string") {
-            return option;
-          }
-          if (option.inputValue) {
-            return `Add "${option.inputValue}"`;
+          if (option.isNew) {
+            return `Add "${option.name}"`;
           }
           return option.name;
         }}
@@ -131,7 +126,6 @@ export const AddItemsComponent = ({
           // Only suggest creating a new value if it doesn't match any existing item
           if (inputValue !== "" && !isExisting) {
             filtered.push({
-              inputValue,
               name: inputValue,
               id: `new-${inputValue}`,
               isNew: true,
@@ -149,7 +143,7 @@ export const AddItemsComponent = ({
           const { key, ...otherProps } = props;
           return (
             <li key={key} {...otherProps}>
-              {option.isNew ? `Add "${option.inputValue}"` : option.name}
+              {option.isNew ? `Add "${option.name}"` : option.name}
             </li>
           );
         }}

@@ -54,6 +54,16 @@ resource "aws_cognito_user_pool_client" "mj_user_pool_client" {
   callback_urls                        = ["http://localhost:3000", "https://${aws_cloudfront_distribution.mbd_web_distribution.domain_name}"]
   logout_urls                          = ["http://localhost:3000", "https://${aws_cloudfront_distribution.mbd_web_distribution.domain_name}"]
   supported_identity_providers         = ["COGNITO"]
+
+  access_token_validity  = 1
+  id_token_validity      = 1
+  refresh_token_validity = 30
+
+  token_validity_units {
+    access_token  = "days"
+    id_token      = "days"
+    refresh_token = "days"
+  }
 }
 
 resource "aws_cognito_user_pool_domain" "mj_user_pool_domain" {

@@ -15,7 +15,7 @@ export default function Home() {
     scope: "openid profile email",
     automaticSilentRenew: true,
     silent_redirect_uri: process.env.NEXT_PUBLIC_COGNITO_REDIRECT,
-    accessTokenExpiringNotificationTimeInSeconds: 2 * 24 * 60 * 60,
+    accessTokenExpiringNotificationTimeInSeconds: 12 * 60 * 60,
   };
 
   return (

@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState } from "react";
 import {
   Autocomplete,
   TextField,
@@ -56,7 +56,6 @@ export const AddItemsComponent = ({
 }: AddItemsComponentProps) => {
   const [inputValue, setInputValue] = useState("");
   const [open, setOpen] = useState(false);
-  const autocompleteRef = useRef<typeof Autocomplete>(null);
 
   const handleDelete = (itemToDelete: Item) => () => {
     onChange(items.filter((item) => item.id !== itemToDelete.id));
@@ -70,6 +69,7 @@ export const AddItemsComponent = ({
 
   const handleKeyDown = (event: React.KeyboardEvent) => {
     if (event.key === "Enter") {
+      event.preventDefault();
       // Get the current filtered options
       const options = getFilteredOptions();
       const filtered = filter(options, {
@@ -77,8 +77,8 @@ export const AddItemsComponent = ({
         getOptionLabel: (option) => option.name,
       });
 
-      // If there's only one option (either existing or new), select it
-      if (filtered.length === 1) {
+      // If there are any options, select the first one
+      if (filtered.length > 0) {
         const option = filtered[0];
         if (!items.some((item) => item.id === option.id)) {
           onChange([...items, option]);
@@ -92,7 +92,6 @@ export const AddItemsComponent = ({
   return (
     <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
       <Autocomplete
-        ref={autocompleteRef}
         open={open}
         onOpen={() => setOpen(true)}
         onClose={() => setOpen(false)}
@@ -143,6 +142,8 @@ export const AddItemsComponent = ({
         handleHomeEndKeys
         autoComplete
         autoSelect
+        autoHighlight
+        disableCloseOnSelect={false}
         renderOption={(props, option) => {
           const { key, ...otherProps } = props;
           return (

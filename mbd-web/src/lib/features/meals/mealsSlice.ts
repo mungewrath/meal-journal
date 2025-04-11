@@ -59,7 +59,7 @@ export const mealsSlice = createAppSlice({
       })
       .addCase(fetchMeals.rejected, (state, action) => {
         state.loading = false;
-        state.loadError = action.error.message || "Failed to fetch meals";
+        state.loadError = action.error?.message ?? "Failed to fetch meals";
       })
       .addCase(saveMeal.pending, (state) => {
         state.saving = true;
@@ -71,7 +71,7 @@ export const mealsSlice = createAppSlice({
       })
       .addCase(saveMeal.rejected, (state, action) => {
         state.saving = false;
-        state.saveError = action.error.message || "Failed to save meal";
+        state.saveError = action.error?.message ?? "Failed to save meal";
       });
   },
   selectors: {

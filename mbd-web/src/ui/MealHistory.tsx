@@ -1,7 +1,14 @@
 "use client";
 
 import { useEffect } from "react";
-import { Box, Typography, CircularProgress, Button, Chip } from "@mui/material";
+import {
+  Box,
+  Typography,
+  CircularProgress,
+  Button,
+  Chip,
+  Alert,
+} from "@mui/material";
 import { useAppSelector, useAppDispatch } from "@/lib/hooks";
 import { useAuth } from "react-oidc-context";
 import {
@@ -9,6 +16,8 @@ import {
   selectLoading,
   selectDaysLoaded,
   fetchMeals,
+  selectLoadError,
+  clearLoadError,
 } from "@/lib/features/meals/mealsSlice";
 import {
   INITIAL_MEAL_DAYS_FETCHED,
@@ -19,6 +28,7 @@ export const MealHistory = () => {
   const meals = useAppSelector(selectMeals);
   const loading = useAppSelector(selectLoading);
   const daysLoaded = useAppSelector(selectDaysLoaded);
+  const loadError = useAppSelector(selectLoadError);
   const dispatch = useAppDispatch();
 
   const auth = useAuth();
@@ -69,6 +79,11 @@ export const MealHistory = () => {
 
   return (
     <Box sx={{ overflow: "auto" }}>
+      {loadError && (
+        <Alert severity="error" onClose={() => dispatch(clearLoadError())}>
+          {loadError}
+        </Alert>
+      )}
       {meals
         .slice()
         .sort(

@@ -3,7 +3,7 @@ import { AuthProvider } from "react-oidc-context";
 import LoginPage from "@/ui/LoginPage";
 import { Box, Container, Typography } from "@mui/material";
 import { Header } from "./Header";
-import { AddComponent } from "@/ui/AddComponent";
+import { AddEntryComponent } from "@/ui/AddEntryComponent";
 import { MealHistory } from "@/ui/MealHistory";
 
 export default function Home() {
@@ -27,7 +27,7 @@ export default function Home() {
             Welcome to My Belly&apos;s Diary
           </Typography>
           <LoginPage />
-          <AddComponent />
+          <AddEntryComponent />
           <MealHistory />
         </Box>
       </Container>

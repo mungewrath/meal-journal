@@ -36,9 +36,6 @@ export const fetchMealsApi = async ({
     }));
   } catch (error) {
     console.error("Error fetching meals:", error);
-    return [];
-    // Fall back to mock data on error
-    // console.warn("Error fetching meals, using mock data");
-    // return generateMockMeals(days, offset);
+    throw error;
   }
 };

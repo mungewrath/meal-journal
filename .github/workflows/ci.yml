@@ -66,13 +66,7 @@ jobs:
       - name: Run tests
         run: |
           cd backend
-          export PATH="/home/runner/.local/share/uv/python/cpython-3.11.11-linux-x86_64-gnu/bin:$PATH"
-          uv python install -v 3.11
-          uv python list
-          uv python dir
-          uv export -q --frozen --no-editable -o requirements.txt
-          uv -v pip install --no-installer-metadata --no-compile-bytecode --python-platform x86_64-manylinux2014 --python 3.11 -r requirements.txt
-          uv run pytest
+          bash run-tests.sh
         env:
           UV_SYSTEM_PYTHON: 1 # Needed for uv pip
 

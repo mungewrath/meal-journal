@@ -62,14 +62,17 @@ jobs:
           name: api_lambda.zip
           path: backend/api_lambda.zip
 
-      - name: Install dev dependencies
+      # Install dev dependencies and run tests
+      # TODO: Can dev dependencies be cached?
+      - name: Run tests
         run: |
           cd backend
+          uv python install 3.11
           uv export -q --frozen --no-editable -o requirements.txt
           uv pip install --system --python 3.11 -r requirements.txt
-
-      - name: Run tests
-        run: uv run pytest
+          uv run pytest
+        env:
+          UV_SYSTEM_PYTHON: 1 # Needed for uv pip
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3

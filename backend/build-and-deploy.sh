@@ -28,7 +28,7 @@ done
 
 uv python install -v 3.11
 uv export -q --frozen --no-dev --no-editable -o requirements.txt
-uv pip install \
+uv pip install -v \
    --no-installer-metadata \
    --no-compile-bytecode \
    --python-platform x86_64-manylinux2014 \

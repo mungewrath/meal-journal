@@ -50,20 +50,25 @@ jobs:
         env:
           UV_SYSTEM_PYTHON: 1 # Needed for uv pip
 
+      - name: Archive build
+        uses: actions/upload-artifact@v4
+        with:
+          name: api_lambda.zip
+          path: backend/api_lambda.zip
+
+      - name: Install dev dependencies
+        run: |
+          cd backend
+          uv pip install -e .[dev]
+
       - name: Run tests
-        run: uv run pytest tests
+        run: uv run pytest
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3
         with:
           file: ./coverage.xml
           fail_ci_if_error: true
-
-      - name: Archive build
-        uses: actions/upload-artifact@v4
-        with:
-          name: api_lambda.zip
-          path: backend/api_lambda.zip
 
   deploy-stage:
     name: "Deploy to Stage"

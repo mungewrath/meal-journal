@@ -67,14 +67,14 @@ jobs:
       - name: Run tests
         run: |
           cd backend
-          uv python install 3.11
+          uv python install -v 3.11
           uv python list
           uv python dir
           uv export -q --frozen --no-editable -o requirements.txt
           uv -v pip install --python 3.11 -r requirements.txt
           uv run pytest
-        env:
-          UV_SYSTEM_PYTHON: 1 # Needed for uv pip
+        # env:
+        # UV_SYSTEM_PYTHON: 1 # Needed for uv pip
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3

@@ -12,6 +12,11 @@ on:
         required: false
         default: false
         type: boolean
+      name:
+        description: "Name of the workflow"
+        required: false
+        default: "Manual Pipeline run"
+        type: string
 
 permissions:
   contents: read
@@ -59,7 +64,7 @@ jobs:
       - name: Install dev dependencies
         run: |
           cd backend
-          uv pip install -e .[dev]
+          uv pip install
 
       - name: Run tests
         run: uv run pytest

@@ -66,6 +66,7 @@ jobs:
       - name: Run tests
         run: |
           cd backend
+          export PATH="/home/runner/.local/share/uv/python/cpython-3.11.11-linux-x86_64-gnu/bin:$PATH"
           uv python install -v 3.11
           uv python list
           uv python dir

@@ -56,12 +56,11 @@ jobs:
         env:
           UV_SYSTEM_PYTHON: 1 # Needed for uv pip
 
-      - name: Archive build
-        uses: actions/upload-artifact@v4
-        with:
-          name: api_lambda.zip
-          path: backend/api_lambda.zip
-
+      # - name: Archive build
+      #   uses: actions/upload-artifact@v4
+      #   with:
+      #     name: api_lambda.zip
+      #     path: backend/api_lambda.zip
       # Install dev dependencies and run tests
       # TODO: Can dev dependencies be cached?
       - name: Run tests
@@ -71,7 +70,8 @@ jobs:
           uv python list
           uv python dir
           uv export -q --frozen --no-editable -o requirements.txt
-          uv -v pip install --python 3.11 -r requirements.txt
+          cat requirements.txt
+          uv -v pip install --no-installer-metadata --no-compile-bytecode --python-platform x86_64-manylinux2014 --python 3.11 -r requirements.txt
           uv run pytest
         # env:
         # UV_SYSTEM_PYTHON: 1 # Needed for uv pip

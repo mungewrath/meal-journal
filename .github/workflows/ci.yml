@@ -50,9 +50,14 @@ jobs:
         env:
           UV_SYSTEM_PYTHON: 1 # Needed for uv pip
 
-      # - name: Run tests
-      #   # For example, using `pytest`
-      #   run: uv run pytest tests
+      - name: Run tests
+        run: uv run pytest tests
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          file: ./coverage.xml
+          fail_ci_if_error: true
 
       - name: Archive build
         uses: actions/upload-artifact@v4

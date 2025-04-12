@@ -56,16 +56,18 @@ jobs:
         env:
           UV_SYSTEM_PYTHON: 1 # Needed for uv pip
 
-      # - name: Archive build
-      #   uses: actions/upload-artifact@v4
-      #   with:
-      #     name: api_lambda.zip
-      #     path: backend/api_lambda.zip
+      - name: Archive build
+        uses: actions/upload-artifact@v4
+        with:
+          name: api_lambda.zip
+          path: backend/api_lambda.zip
+
       # Install dev dependencies and run tests
       # TODO: Can dev dependencies be cached?
       - name: Run tests
         run: |
           cd backend
+          # For some reason, running this without a separate bash script fails to resolve uv python3.11
           bash run-tests.sh
         env:
           UV_SYSTEM_PYTHON: 1 # Needed for uv pip
@@ -73,7 +75,7 @@ jobs:
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3
         with:
-          file: ./coverage.xml
+          file: backend/coverage.xml
           fail_ci_if_error: true
 
   deploy-stage:

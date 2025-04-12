@@ -53,8 +53,6 @@ jobs:
         run: |
           cd backend
           bash build-and-deploy.sh -s
-        env:
-          UV_SYSTEM_PYTHON: 1 # Needed for uv pip
 
       - name: Archive build
         uses: actions/upload-artifact@v4
@@ -69,8 +67,6 @@ jobs:
           cd backend
           # For some reason, running this without a separate bash script fails to resolve uv python3.11
           bash run-tests.sh
-        # env:
-        # UV_SYSTEM_PYTHON: 1 # Needed for uv pip
 
   deploy-stage:
     name: "Deploy to Stage"

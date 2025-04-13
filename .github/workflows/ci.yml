@@ -1,4 +1,5 @@
 name: "CI Pipeline"
+run-name: "${{ inputs.run_name }}"
 
 on:
   push:
@@ -12,6 +13,11 @@ on:
         required: false
         default: false
         type: boolean
+      run_name:
+        description: "Name for this workflow run"
+        required: false
+        default: "Manual Pipeline run"
+        type: string
 
 permissions:
   contents: read
@@ -47,18 +53,20 @@ jobs:
         run: |
           cd backend
           bash build-and-deploy.sh -s
-        env:
-          UV_SYSTEM_PYTHON: 1 # Needed for uv pip
-
-      # - name: Run tests
-      #   # For example, using `pytest`
-      #   run: uv run pytest tests
 
       - name: Archive build
         uses: actions/upload-artifact@v4
         with:
           name: api_lambda.zip
           path: backend/api_lambda.zip
+
+      # Install dev dependencies and run tests
+      # TODO: Can dev dependencies be cached?
+      - name: Run tests
+        run: |
+          cd backend
+          # For some reason, running this without a separate bash script fails to resolve uv python3.11
+          bash run-tests.sh
 
   deploy-stage:
     name: "Deploy to Stage"

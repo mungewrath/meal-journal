@@ -117,6 +117,12 @@ async def create_food(
         food_list = MbdFoodList.get(user_id)
     except MbdFoodList.DoesNotExist:
         food_list = MbdFoodList(user_id=user_id)
+    # Check if a food with the same ID already exists
+    if any(f.name.lower() == request.name.lower() for f in food_list.foods):
+        return JSONResponse(
+            {"detail": f"Food with name {request.name} already exists."},
+            status_code=400,
+        )
 
     food = MbdFood(
         food_id=request.id,

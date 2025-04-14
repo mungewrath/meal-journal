@@ -7,36 +7,16 @@ from meals.meal import MbdMeal
 
 
 def get_suggested_foods(user_id: str, meal_type: str) -> List[MbdFood]:
-    """
-    Get suggested foods for a given meal type based on the following rules:
-    1. Foods the user ate for that meal type yesterday
-    2. Foods that appear in >80% of their last 20 meals
-
-    Args:
-        user_id: The user ID
-        meal_type: The meal type (e.g., "Breakfast", "Lunch", "Dinner")
-
-    Returns:
-        A list of suggested foods
-    """
     # Get foods from yesterday's meals of the specified type
-    yesterday_food_ids, yesterday_foods_map = get_yesterday_foods(user_id, meal_type)
+    yesterdays_foods_map = get_yesterdays_foods(user_id, meal_type)
 
     # Get frequently eaten foods from the last 20 meals
-    frequent_food_ids, frequent_foods_map = get_frequent_foods(user_id)
+    frequent_foods_map = get_frequent_foods(user_id)
 
-    # Combine both sets of food IDs
-    suggested_food_ids = yesterday_food_ids.union(frequent_food_ids)
-
-    # Convert food IDs to food objects
-    return convert_food_ids_to_objects(
-        suggested_food_ids, yesterday_foods_map, frequent_foods_map
-    )
+    return list((yesterdays_foods_map | frequent_foods_map).values())
 
 
-def get_yesterday_foods(
-    user_id: str, meal_type: str
-) -> Tuple[Set[str], Dict[str, MbdFood]]:
+def get_yesterdays_foods(user_id: str, meal_type: str) -> Dict[str, MbdFood]:
     """
     Get foods from yesterday's meals of the specified type.
 
@@ -52,30 +32,27 @@ def get_yesterday_foods(
     # Get yesterday's date range
     yesterday = datetime.now(timezone.utc) - timedelta(days=1)
     yesterday_start = yesterday.replace(hour=0, minute=0, second=0, microsecond=0)
-    yesterday_end = yesterday.replace(hour=23, minute=59, second=59, microsecond=999999)
+    yesterday_end = yesterday_start + timedelta(days=1)
 
-    # Get yesterday's meals
-    yesterday_meals = MbdMeal.query(
+    yesterdays_meals = MbdMeal.query(
         hash_key=user_id,
         range_key_condition=MbdMeal.date_time.between(yesterday_start, yesterday_end),
     )
 
     # Filter for the specific meal type
-    yesterday_meals_of_type = [
-        meal for meal in yesterday_meals if meal.meal_type == meal_type
+    yesterdays_meals_of_type = [
+        meal for meal in yesterdays_meals if meal.meal_type == meal_type
     ]
 
-    yesterday_food_ids = set()
-    yesterday_foods_map = {}
-    for meal in yesterday_meals_of_type:
+    yesterdays_foods = {}
+    for meal in yesterdays_meals_of_type:
         for food in meal.foods:
-            yesterday_food_ids.add(food.food_id)
-            yesterday_foods_map[food.food_id] = food
+            yesterdays_foods[food.food_id] = food
 
-    return yesterday_food_ids, yesterday_foods_map
+    return yesterdays_foods
 
 
-def get_frequent_foods(user_id: str) -> Tuple[Set[str], Dict[str, MbdFood]]:
+def get_frequent_foods(user_id: str) -> Dict[str, MbdFood]:
     """
     Get foods that appear in >80% of the user's last 20 meals.
 
@@ -110,12 +87,13 @@ def get_frequent_foods(user_id: str) -> Tuple[Set[str], Dict[str, MbdFood]]:
             food_counter[food.food_id] += 1
             frequent_foods_map[food.food_id] = food
 
-    # Get food IDs that appear in >80% of the last 20 meals
-    frequent_food_ids = {
-        food_id for food_id, count in food_counter.items() if count >= 16
-    }  # 80% of 20 meals
+    frequent_foods = {
+        food_id: frequent_foods_map[food_id]
+        for food_id, count in food_counter.items()
+        if count >= len(last_20_meals) * 0.8
+    }
 
-    return frequent_food_ids, frequent_foods_map
+    return frequent_foods
 
 
 def convert_food_ids_to_objects(

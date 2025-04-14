@@ -1,12 +1,12 @@
 import base64
 import json
 
-from fastapi import HTTPException
+from shared.exceptions import MbdException
 
 
 def get_user_id(auth_token: str) -> str:
     if not auth_token:
-        raise HTTPException(status_code=401, detail="Authorization header is required")
+        raise MbdException(status_code=401, errors=["Authorization header is required"])
 
     d = decode_jwt(auth_token.replace("Bearer ", ""))
     return d["payload"]["sub"]

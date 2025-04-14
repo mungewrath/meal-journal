@@ -5,7 +5,7 @@ from typing import Annotated
 import uuid
 import traceback
 
-from fastapi import FastAPI, Header, Request
+from fastapi import FastAPI, Header, Request, HTTPException
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from mangum import Mangum
@@ -17,6 +17,7 @@ from meals.meal import MbdMeal
 from shared.auth import get_user_id
 from preferences.preferences import MbdPreferences
 from dotenv import load_dotenv
+from foods.suggested import get_suggested_foods
 
 ENV = os.getenv("ENVIRONMENT")
 
@@ -142,14 +143,16 @@ async def create_food(
 async def get_food(
     food_id: str, authorization: Annotated[str | None, Header()] = None
 ) -> dict:
-    food_list = MbdFoodList.get(get_user_id(authorization))
+    user_id = get_user_id(authorization)
+    food_list = MbdFoodList.get(user_id)
     food = next((f for f in food_list.foods if f.food_id == food_id), None)
     return food.to_dto()
 
 
 @app.get("/foods")
 async def get_foods(authorization: Annotated[str | None, Header()] = None) -> dict:
-    food_list = MbdFoodList.get(get_user_id(authorization))
+    user_id = get_user_id(authorization)
+    food_list = MbdFoodList.get(user_id)
     return food_list.to_dto()
 
 
@@ -192,5 +195,18 @@ async def get_meal_history(
             datetime.now(timezone.utc) - timedelta(days=offset),
         ),
     )
-    meals = sorted(meals, key=lambda meal: meal.date_time, reverse=True)
-    return [meal.to_dto() for meal in meals]
+
+    return [
+        meal.to_dto()
+        for meal in sorted(meals, key=lambda meal: meal.date_time, reverse=True)
+    ]
+
+
+@app.get("/foods/suggested/{meal_type}")
+async def get_suggested_foods_endpoint(
+    meal_type: str,
+    authorization: Annotated[str | None, Header()] = None,
+) -> list[dict]:
+    user_id = get_user_id(authorization)
+    suggested_foods = get_suggested_foods(user_id, meal_type)
+    return [food.to_dto() for food in suggested_foods]

@@ -104,3 +104,44 @@ async def test_create_food__returns_bad_request_if_food_exists_ignoring_case(
     # Verify no new food was added to the list
     assert len(mock_food_list.foods) == 1
     mock_food_list.save.assert_not_called()
+
+
+@patch("app.main.get_suggested_foods")
+async def test_get_suggested_foods_endpoint(
+    mock_get_suggested_foods, client, mock_get_user_id
+):
+    # Setup
+    meal_type = "Breakfast"
+
+    # Create mock foods
+    food1 = MbdFood()
+    food1.food_id = str(uuid4())
+    food1.name = "Oatmeal"
+    food1.thumbnail = "🥣"
+
+    food2 = MbdFood()
+    food2.food_id = str(uuid4())
+    food2.name = "Banana"
+    food2.thumbnail = "🍌"
+
+    # Mock the get_suggested_foods function
+    mock_get_suggested_foods.return_value = [food1, food2]
+
+    # Make the request
+    response = client.get(
+        f"/foods/suggested/{meal_type}",
+        headers={"Authorization": "Bearer test-token"},
+    )
+
+    # Verify the response
+    assert response.status_code == 200
+    data = response.json()
+    assert len(data) == 2
+
+    # Verify the food data
+    food_ids = {food["food_id"] for food in data}
+    assert food1.food_id in food_ids
+    assert food2.food_id in food_ids
+
+    # Verify the function was called with the correct arguments
+    mock_get_suggested_foods.assert_called_once_with("test-user", meal_type)

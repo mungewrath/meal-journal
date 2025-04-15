@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta, timezone
-from typing import List, Dict, Set, Tuple
+from typing import List, Dict, Set
 from collections import Counter
 
 from foods.food import MbdFood
@@ -12,11 +12,10 @@ def get_suggested_foods(user_id: str, meal_type: str) -> List[MbdFood]:
 
     # Get frequently eaten foods from the last 20 meals
     frequent_foods_map = get_frequent_foods(user_id)
+    return list(yesterdays_foods_map | frequent_foods_map)
 
-    return list((yesterdays_foods_map | frequent_foods_map).values())
 
-
-def get_yesterdays_foods(user_id: str, meal_type: str) -> Dict[str, MbdFood]:
+def get_yesterdays_foods(user_id: str, meal_type: str) -> Set[MbdFood]:
     """
     Get foods from yesterday's meals of the specified type.
 
@@ -44,15 +43,14 @@ def get_yesterdays_foods(user_id: str, meal_type: str) -> Dict[str, MbdFood]:
         meal for meal in yesterdays_meals if meal.meal_type == meal_type
     ]
 
-    yesterdays_foods = {}
+    yesterdays_foods = set()
     for meal in yesterdays_meals_of_type:
-        for food in meal.foods:
-            yesterdays_foods[food.food_id] = food
+        yesterdays_foods.update(meal.foods)
 
     return yesterdays_foods
 
 
-def get_frequent_foods(user_id: str) -> Dict[str, MbdFood]:
+def get_frequent_foods(user_id: str) -> Set[MbdFood]:
     """
     Get foods that appear in >80% of the user's last 20 meals.
 
@@ -88,7 +86,7 @@ def get_frequent_foods(user_id: str) -> Dict[str, MbdFood]:
             frequent_foods_map[food.food_id] = food
 
     frequent_foods = {
-        food_id: frequent_foods_map[food_id]
+        frequent_foods_map[food_id]
         for food_id, count in food_counter.items()
         if count >= len(last_20_meals) * 0.8
     }

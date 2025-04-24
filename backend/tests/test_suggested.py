@@ -35,7 +35,7 @@ def create_mock_meal(user_id, meal_type, date_time, foods):
 
 
 @patch("foods.suggested.MbdMeal.query")
-def test_get_suggested_foods__includes_foods_from_yesterday_meal(mock_query):
+def test_get_suggested_foods__includes_foods_from_yesterdays_meal(mock_query):
     """Test that foods from yesterday's meal of the specified type are included"""
     # Setup
     user_id = "test-user"
@@ -120,7 +120,7 @@ def test_get_suggested_foods__includes_frequently_eaten_foods(mock_query):
 
 
 @patch("foods.suggested.MbdMeal.query")
-def test_get_suggested_foods__combines_yesterday_and_frequent_foods(mock_query):
+def test_get_suggested_foods__combines_yesterdays_and_frequent_foods(mock_query):
     """Test that both rules are applied and combined correctly"""
     # Setup
     user_id = "test-user"

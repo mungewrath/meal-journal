@@ -29,7 +29,7 @@ def get_yesterdays_foods(user_id: str, meal_type: str) -> Set[MbdFood]:
         - Dictionary mapping food IDs to food objects
     """
     # Get yesterday's date range
-    yesterday = datetime.now(timezone.utc) - timedelta(days=1)
+    yesterday = datetime.now(timezone(timedelta(hours=-8))) - timedelta(days=1)
     yesterday_start = yesterday.replace(hour=0, minute=0, second=0, microsecond=0)
     yesterday_end = yesterday_start + timedelta(days=1)
 
@@ -63,7 +63,7 @@ def get_frequent_foods(user_id: str) -> Set[MbdFood]:
         - Dictionary mapping food IDs to food objects
     """
     # Get the last 30 days of meals (to ensure we have enough)
-    now = datetime.now(timezone.utc)
+    now = datetime.now()
     thirty_days_ago = now - timedelta(days=30)
 
     # Query meals from the last 30 days

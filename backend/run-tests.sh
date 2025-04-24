@@ -1,4 +1,6 @@
 #!/bin/bash -x
+# Used for running the tests in CI/CD.
+# For some reason, the direct commands don't work; only if they are wrapped in a script.
 
 uv python install -v 3.11
 uv export -q --frozen --no-editable -o requirements.txt

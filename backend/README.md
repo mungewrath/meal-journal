@@ -8,7 +8,7 @@
 ## Testing
 
 ### Running Tests
-To run the full test suite:
+To run the full test suite from the backend/ directory:
 ```bash
 # This will generate coverage report
 uv run pytest

@@ -4,6 +4,10 @@
 - `uv sync` - Installs packages
 - `uv lock` - Updates uv.lock file for consistent dependencies
 - [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html) for local debugging
+- Access keys an an AWS_PROFILE configured in the CLI for each environment:
+    - Stage: AWS profile should be named `mealjournal-stage`
+    - Prod: AWS profile should be named `mealjournal-prod`
+    - Run `aws configure --profile <name of the profile>`
 
 ## Testing
 

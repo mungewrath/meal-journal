@@ -2,7 +2,7 @@
   "version": "0.0.1",
   "configurations": [
     {
-      "name": "API:DEV",
+      "name": "API:Stage",
       "type": "debugpy",
       "request": "launch",
       "module": "fastapi",
@@ -10,20 +10,22 @@
       "args": ["dev"],
       "justMyCode": false,
       "env": {
-        "ENVIRONMENT": "dev"
+        "ENVIRONMENT": "dev", // Currently, backend only needs one set of variables
+        "AWS_PROFILE": "mealjournal-stage"
+      }
+    },
+    {
+      "name": "API:PROD",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "fastapi",
+      "cwd": "${workspaceFolder}/app",
+      "args": ["dev"],
+      "justMyCode": false,
+      "env": {
+        "ENVIRONMENT": "dev", // Currently, backend only needs one set of variables
+        "AWS_PROFILE": "mealjournal-prod"
       }
     }
-    // {
-    //   "name": "API:PROD",
-    //   "type": "debugpy",
-    //   "request": "launch",
-    //   "module": "fastapi",
-    //   "cwd": "${workspaceFolder}/app",
-    //   "args": ["run"],
-    //   "justMyCode": false,
-    //   "env": {
-    //     "ENVIRONMENT": "prod"
-    //   }
-    // }
   ]
 }

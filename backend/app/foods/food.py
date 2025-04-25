@@ -21,6 +21,18 @@ class MbdFood(MapAttribute):
             "thumbnail": self.thumbnail,
         }
 
+    def __hash__(self):
+        return self.food_id.__hash__()
+
+    def __eq__(self, other):
+        if not isinstance(other, MbdFood):
+            return False
+        return (
+            self.food_id == other.food_id
+            and self.name == other.name
+            and self.thumbnail == other.thumbnail
+        )
+
 
 class MbdFoodList(Model):
     class Meta:

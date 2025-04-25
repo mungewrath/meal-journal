@@ -5,7 +5,7 @@ from typing import Annotated
 import uuid
 import traceback
 
-from fastapi import FastAPI, Header, Request
+from fastapi import FastAPI, Header, Request, HTTPException
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from mangum import Mangum
@@ -17,14 +17,20 @@ from meals.meal import MbdMeal
 from shared.auth import get_user_id
 from preferences.preferences import MbdPreferences
 from dotenv import load_dotenv
+from foods.suggested import get_suggested_foods
+from shared.exceptions import MbdException
 
 ENV = os.getenv("ENVIRONMENT")
 
-if ENV is not None:
-    load_dotenv(f".env.{ENV}")
-
-logger = logging.getLogger()
+logger = logging.getLogger("uvicorn.error")
 logger.setLevel(logging.INFO)
+
+
+if ENV is not None:
+    logger.info("Loading environment: %s", ENV)
+    load_dotenv(f".env.{ENV}")
+else:
+    logger.warning("Hmm... no ENV value set")
 
 app = FastAPI(root_path="/api/v1")
 
@@ -117,11 +123,15 @@ async def create_food(
         food_list = MbdFoodList.get(user_id)
     except MbdFoodList.DoesNotExist:
         food_list = MbdFoodList(user_id=user_id)
+    except Exception as e:
+        logger.error("Exception occurred: %s", traceback.format_exc())
+        raise e
+
     # Check if a food with the same ID already exists
     if any(f.name.lower() == request.name.lower() for f in food_list.foods):
-        return JSONResponse(
-            {"detail": f"Food with name {request.name} already exists."},
+        raise MbdException(
             status_code=400,
+            errors=[f"Food with name {request.name} already exists."],
         )
 
     food = MbdFood(
@@ -142,14 +152,28 @@ async def create_food(
 async def get_food(
     food_id: str, authorization: Annotated[str | None, Header()] = None
 ) -> dict:
-    food_list = MbdFoodList.get(get_user_id(authorization))
+    user_id = get_user_id(authorization)
+    try:
+        food_list = MbdFoodList.get(user_id)
+    except MbdFoodList.DoesNotExist:
+        food_list = MbdFoodList(user_id=user_id)
+
     food = next((f for f in food_list.foods if f.food_id == food_id), None)
+
+    if food is None:
+        raise HTTPException(status_code=404, detail=f"Food with ID {food_id} not found")
+
     return food.to_dto()
 
 
 @app.get("/foods")
 async def get_foods(authorization: Annotated[str | None, Header()] = None) -> dict:
-    food_list = MbdFoodList.get(get_user_id(authorization))
+    user_id = get_user_id(authorization)
+    try:
+        food_list = MbdFoodList.get(user_id)
+    except MbdFoodList.DoesNotExist:
+        food_list = MbdFoodList(user_id=user_id)
+
     return food_list.to_dto()
 
 
@@ -192,5 +216,18 @@ async def get_meal_history(
             datetime.now(timezone.utc) - timedelta(days=offset),
         ),
     )
-    meals = sorted(meals, key=lambda meal: meal.date_time, reverse=True)
-    return [meal.to_dto() for meal in meals]
+
+    return [
+        meal.to_dto()
+        for meal in sorted(meals, key=lambda meal: meal.date_time, reverse=True)
+    ]
+
+
+@app.get("/foods/suggested/{meal_type}")
+async def get_suggested_foods_endpoint(
+    meal_type: str,
+    authorization: Annotated[str | None, Header()] = None,
+) -> list[dict]:
+    user_id = get_user_id(authorization)
+    suggested_foods = get_suggested_foods(user_id, meal_type)
+    return [food.to_dto() for food in suggested_foods]

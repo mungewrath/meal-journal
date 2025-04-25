@@ -153,7 +153,11 @@ async def get_food(
     food_id: str, authorization: Annotated[str | None, Header()] = None
 ) -> dict:
     user_id = get_user_id(authorization)
-    food_list = MbdFoodList.get(user_id)
+    try:
+        food_list = MbdFoodList.get(user_id)
+    except MbdFoodList.DoesNotExist:
+        food_list = MbdFoodList(user_id=user_id)
+
     food = next((f for f in food_list.foods if f.food_id == food_id), None)
 
     if food is None:

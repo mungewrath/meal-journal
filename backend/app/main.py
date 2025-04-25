@@ -18,14 +18,19 @@ from shared.auth import get_user_id
 from preferences.preferences import MbdPreferences
 from dotenv import load_dotenv
 from foods.suggested import get_suggested_foods
+from shared.exceptions import MbdException
 
 ENV = os.getenv("ENVIRONMENT")
 
-if ENV is not None:
-    load_dotenv(f".env.{ENV}")
-
-logger = logging.getLogger()
+logger = logging.getLogger("uvicorn.error")
 logger.setLevel(logging.INFO)
+
+
+if ENV is not None:
+    logger.info("Loading environment: %s", ENV)
+    load_dotenv(f".env.{ENV}")
+else:
+    logger.warning("Hmm... no ENV value set")
 
 app = FastAPI(root_path="/api/v1")
 
@@ -118,11 +123,15 @@ async def create_food(
         food_list = MbdFoodList.get(user_id)
     except MbdFoodList.DoesNotExist:
         food_list = MbdFoodList(user_id=user_id)
+    except Exception as e:
+        logger.error("Exception occurred: %s", traceback.format_exc())
+        raise e
+
     # Check if a food with the same ID already exists
     if any(f.name.lower() == request.name.lower() for f in food_list.foods):
-        return JSONResponse(
-            {"detail": f"Food with name {request.name} already exists."},
+        raise MbdException(
             status_code=400,
+            errors=[f"Food with name {request.name} already exists."],
         )
 
     food = MbdFood(
@@ -146,6 +155,10 @@ async def get_food(
     user_id = get_user_id(authorization)
     food_list = MbdFoodList.get(user_id)
     food = next((f for f in food_list.foods if f.food_id == food_id), None)
+
+    if food is None:
+        raise HTTPException(status_code=404, detail=f"Food with ID {food_id} not found")
+
     return food.to_dto()
 
 

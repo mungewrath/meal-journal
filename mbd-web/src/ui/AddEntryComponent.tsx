@@ -19,7 +19,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import SaveIcon from "@mui/icons-material/Save";
 import RestaurantIcon from "@mui/icons-material/Restaurant";
 import HealingIcon from "@mui/icons-material/Healing";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { AddItemsComponent } from "@/ui/AddItemsComponent";
 import { useAppDispatch, useAppSelector } from "@/lib/hooks";
 import {
@@ -28,18 +28,33 @@ import {
   selectSaving,
   selectSaveError,
 } from "@/lib/features/meals/mealsSlice";
+import {
+  fetchSuggestedFoods,
+  selectSuggestedFoods,
+  selectLoading as selectFoodsLoading,
+  selectError as selectFoodsError,
+  clearSuggestedFoods,
+  clearError as clearSuggestedFoodsError,
+} from "@/lib/features/foods/foodsSlice";
 import { useAuth } from "react-oidc-context";
 
 interface Item {
   id: string;
   name: string;
+  suggested: boolean;
+  selected: boolean;
 }
 
 export const AddEntryComponent = () => {
   const dispatch = useAppDispatch();
   const auth = useAuth();
+
   const saving = useAppSelector(selectSaving);
   const saveError = useAppSelector(selectSaveError);
+  const suggestedFoods = useAppSelector(selectSuggestedFoods);
+  const foodsLoading = useAppSelector(selectFoodsLoading);
+  const foodsError = useAppSelector(selectFoodsError);
+
   const [entryName, setEntryName] = useState("");
   const [date, setDate] = useState("");
   const [time, setTime] = useState("");
@@ -75,6 +90,7 @@ export const AddEntryComponent = () => {
     setDate(new Date().toISOString().split("T")[0]);
     setTime("");
     setSelectedItems([]);
+    dispatch(clearSuggestedFoods());
   };
 
   const handleSave = async () => {
@@ -90,14 +106,18 @@ export const AddEntryComponent = () => {
           meal: {
             mealType: entryName,
             dateTime,
-            foods: selectedItems.map((item) => ({
-              name: item.name,
-            })),
+            foods: selectedItems
+              .filter((food) => food.selected)
+              .map((item) => ({
+                food_id: item.id,
+                name: item.name,
+              })),
           },
           idToken: auth.user.id_token,
         })
       );
 
+      // TODO: Is this going to catch errors correctly? Looks like the dispatch is async and this won't be updated
       if (!saveError) {
         handleClear();
       }
@@ -108,10 +128,44 @@ export const AddEntryComponent = () => {
   };
 
   useEffect(() => {
-    // Set the default date to today's date
-    const today = new Date().toISOString().split("T")[0];
-    setDate(today);
+    // Set the default date to today's date in Pacific Time
+    const today = new Date();
+    const pacificOffset = -7 * 60; // Pacific Time is UTC-7
+    const pacificDate = new Date(today.getTime() + pacificOffset * 60 * 1000);
+    const formattedDate = pacificDate.toISOString().split("T")[0];
+    setDate(formattedDate);
   }, []);
+
+  // Fetch suggested foods when meal type changes. Dependent on auth being available
+  // which is why it can't be a direct event handler
+  useEffect(() => {
+    if (selectedOption === "meal" && entryName && auth.user?.id_token) {
+      dispatch(
+        fetchSuggestedFoods({
+          mealType: entryName,
+          idToken: auth.user.id_token,
+        })
+      );
+    }
+  }, [selectedOption, entryName, auth.user?.id_token, dispatch]);
+
+  const mergedSelectedItems = useMemo(() => {
+    const prevAndSuggested = [
+      ...selectedItems.filter((item) => !item.suggested || item.selected),
+      ...suggestedFoods.map((food) => ({
+        id: food.id,
+        name: food.name,
+        suggested: true,
+        selected: false,
+      })),
+    ];
+
+    return prevAndSuggested
+      .filter(
+        (item, index, self) => index === self.findIndex((t) => t.id === item.id)
+      )
+      .sort((a, b) => a.name.localeCompare(b.name));
+  }, [selectedItems, suggestedFoods]);
 
   return (
     <Accordion expanded={expanded} onChange={handleAccordionChange}>
@@ -129,9 +183,15 @@ export const AddEntryComponent = () => {
           component="form"
           sx={{ display: "flex", flexDirection: "column", gap: 2 }}
         >
-          {saveError && (
-            <Alert severity="error" onClose={() => dispatch(clearSaveError())}>
-              {saveError}
+          {(saveError || foodsError) && (
+            <Alert
+              severity="error"
+              onClose={() => {
+                dispatch(clearSaveError());
+                dispatch(clearSuggestedFoodsError());
+              }}
+            >
+              {saveError || foodsError}
             </Alert>
           )}
           <Box sx={{ display: "flex", justifyContent: "space-between" }}>
@@ -196,12 +256,17 @@ export const AddEntryComponent = () => {
                 </Select>
               </FormControl>
               <AddItemsComponent
-                items={selectedItems}
+                items={mergedSelectedItems}
                 onChange={setSelectedItems}
-                disabled={saving}
+                disabled={saving || foodsLoading}
                 placeholder="Search for foods or add a new one..."
                 label="Food"
               />
+              {foodsLoading && (
+                <Box sx={{ display: "flex", justifyContent: "center", mt: 2 }}>
+                  <CircularProgress size={24} />
+                </Box>
+              )}
             </>
           ) : (
             <AddItemsComponent
@@ -228,7 +293,10 @@ export const AddEntryComponent = () => {
               startIcon={saving ? <CircularProgress size={20} /> : <SaveIcon />}
               onClick={handleSave}
               disabled={
-                saving || !entryName || !date || selectedItems.length === 0
+                saving ||
+                !entryName ||
+                !date ||
+                mergedSelectedItems.filter((f) => f.selected).length === 0
               }
             >
               {saving ? "Saving..." : "Save"}

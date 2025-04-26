@@ -13,25 +13,27 @@ interface Item {
   id: string;
   name: string;
   isNew?: boolean;
+  suggested: boolean;
+  selected: boolean;
 }
 
 // Temporary placeholder data - will be replaced with API call
 const placeholderItems: Record<string, Item[]> = {
   food: [
-    { id: "1", name: "Apple" },
-    { id: "2", name: "Banana" },
-    { id: "3", name: "Chicken" },
-    { id: "4", name: "Rice" },
-    { id: "5", name: "Salmon" },
-    { id: "6", name: "Broccoli" },
+    { id: "1", name: "Apple", suggested: false, selected: true },
+    { id: "2", name: "Banana", suggested: false, selected: true },
+    { id: "3", name: "Chicken", suggested: false, selected: true },
+    { id: "4", name: "Rice", suggested: false, selected: true },
+    { id: "5", name: "Salmon", suggested: false, selected: true },
+    { id: "6", name: "Broccoli", suggested: false, selected: true },
   ],
   symptom: [
-    { id: "1", name: "Headache" },
-    { id: "2", name: "Nausea" },
-    { id: "3", name: "Fatigue" },
-    { id: "4", name: "Bloating" },
-    { id: "5", name: "Dizziness" },
-    { id: "6", name: "Heartburn" },
+    { id: "1", name: "Headache", suggested: false, selected: true },
+    { id: "2", name: "Nausea", suggested: false, selected: true },
+    { id: "3", name: "Fatigue", suggested: false, selected: true },
+    { id: "4", name: "Bloating", suggested: false, selected: true },
+    { id: "5", name: "Dizziness", suggested: false, selected: true },
+    { id: "6", name: "Heartburn", suggested: false, selected: true },
   ],
 };
 
@@ -56,6 +58,17 @@ export const AddItemsComponent = ({
 }: AddItemsComponentProps) => {
   const [inputValue, setInputValue] = useState("");
   const [open, setOpen] = useState(false);
+
+  const handleSuggestedItemClick = (item: Item) => {
+    if (!item.selected) {
+      onChange([
+        ...items.filter((selectedItem) => selectedItem.id !== item.id),
+        { ...item, selected: true },
+      ]);
+    } else {
+      onChange(items.filter((selectedItem) => selectedItem.id !== item.id));
+    }
+  };
 
   const handleDelete = (itemToDelete: Item) => () => {
     onChange(items.filter((item) => item.id !== itemToDelete.id));
@@ -132,6 +145,8 @@ export const AddItemsComponent = ({
               name: inputValue,
               id: `new-${inputValue}`,
               isNew: true,
+              suggested: false,
+              selected: true,
             });
           }
 
@@ -167,6 +182,9 @@ export const AddItemsComponent = ({
           <Chip
             key={item.id}
             label={item.name}
+            color={item.selected ? "primary" : "default"}
+            variant={item.selected ? "filled" : "outlined"}
+            onClick={() => handleSuggestedItemClick(item)}
             onDelete={handleDelete(item)}
             deleteIcon={
               <IconButton size="small">

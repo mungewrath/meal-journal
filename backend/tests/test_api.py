@@ -1,3 +1,4 @@
+from datetime import datetime, timedelta, timezone
 from unittest.mock import patch, MagicMock
 from uuid import uuid4
 
@@ -145,3 +146,72 @@ async def test_get_suggested_foods_endpoint(
 
     # Verify the function was called with the correct arguments
     mock_get_suggested_foods.assert_called_once_with("test-user", meal_type)
+
+
+@patch("app.main.MbdSymptomsEntry.query")
+async def test_get_symptom_history__returns_symptom_history(
+    mock_query, client, mock_get_user_id
+):
+    # Create mock symptom entries
+    entry1 = MagicMock()
+    entry1.date_time = datetime.now(timezone.utc) - timedelta(days=1)
+    entry1.to_dto.return_value = {
+        "dateTime": entry1.date_time.isoformat(),
+        "symptoms": ["Headache"],
+    }
+
+    entry2 = MagicMock()
+    entry2.date_time = datetime.now(timezone.utc) - timedelta(days=2)
+    entry2.to_dto.return_value = {
+        "dateTime": entry2.date_time.isoformat(),
+        "symptoms": ["Nausea"],
+    }
+
+    # Mock the query result
+    mock_query.return_value = [entry1, entry2]
+
+    # Make the request
+    response = client.get(
+        "/symptoms/history?days=3&offset=0",
+        headers={"Authorization": "Bearer test-token"},
+    )
+
+    # Verify the response
+    assert response.status_code == 200
+    data = response.json()
+    assert len(data) == 2
+
+    # Verify the entries are sorted by date (most recent first)
+    assert data[0]["dateTime"] == entry1.date_time.isoformat()
+    assert data[1]["dateTime"] == entry2.date_time.isoformat()
+
+    # Verify the query was called with the correct parameters
+    mock_query.assert_called_once()
+    args, kwargs = mock_query.call_args
+    assert kwargs["hash_key"] == "test-user"
+    # We can't directly compare the range_key_condition objects, but we can verify it was called
+
+
+@patch("app.main.MbdSymptomsEntry.query")
+async def test_get_symptom_history__with_custom_days_and_offset(
+    mock_query, client, mock_get_user_id
+):
+    # Mock the query result
+    mock_query.return_value = []
+
+    # Make the request with custom days and offset
+    days = 5
+    offset = 2
+    response = client.get(
+        f"/symptoms/history?days={days}&offset={offset}",
+        headers={"Authorization": "Bearer test-token"},
+    )
+
+    # Verify the response
+    assert response.status_code == 200
+
+    # Verify the query was called with the correct parameters
+    mock_query.assert_called_once()
+    args, kwargs = mock_query.call_args
+    assert kwargs["hash_key"] == "test-user"
+    # We can't directly compare the range_key_condition objects, but we can verify it was called

@@ -37,3 +37,21 @@ resource "aws_dynamodb_table" "mbd_foods" {
     type = "S"
   }
 }
+
+resource "aws_dynamodb_table" "mbd_symptoms" {
+  name         = "mbd_symptoms"
+  billing_mode = "PAY_PER_REQUEST"
+  hash_key     = "user_id"
+  range_key    = "date_time"
+
+  attribute {
+    name = "user_id"
+    type = "S"
+  }
+
+  # Define date as a range key
+  attribute {
+    name = "date_time"
+    type = "S"
+  }
+}

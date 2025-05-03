@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta, timezone
-from typing import List, Dict, Set
+from zoneinfo import ZoneInfo
+from typing import List, Set
 from collections import Counter
 
 from foods.food import MbdFood
@@ -24,18 +25,12 @@ def get_yesterdays_foods(user_id: str, meal_type: str) -> Set[MbdFood]:
         meal_type: The meal type (e.g., "Breakfast", "Lunch", "Dinner")
 
     Returns:
-        A tuple containing:
-        - Set of food IDs from yesterday's meals of the specified type
-        - Dictionary mapping food IDs to food objects
+        Set of food IDs from yesterday's meals of the specified type
     """
-    # Get yesterday's date range
-    yesterday = datetime.now(timezone(timedelta(hours=-8))) - timedelta(days=1)
-    yesterday_start = yesterday.replace(hour=0, minute=0, second=0, microsecond=0)
-    yesterday_end = yesterday_start + timedelta(days=1)
 
     yesterdays_meals = MbdMeal.query(
         hash_key=user_id,
-        range_key_condition=MbdMeal.date_time.between(yesterday_start, yesterday_end),
+        range_key_condition=MbdMeal.date_time.between(*get_yesterday_start_and_end()),
     )
 
     # Filter for the specific meal type
@@ -50,6 +45,21 @@ def get_yesterdays_foods(user_id: str, meal_type: str) -> Set[MbdFood]:
     return yesterdays_foods
 
 
+def get_yesterday_start_and_end() -> tuple[datetime, datetime]:
+    # Get the current date from the user's timezone (Pacific time for now).
+    # Then, calculate the start and end of their "yesterday" in UTC.
+    # All dates are input as local time, but stored UTC
+    yesterday = datetime.now(ZoneInfo("US/Pacific")) - timedelta(days=1)
+    yesterday_date = yesterday.date()
+    yesterday_start = datetime.combine(
+        yesterday_date, datetime.min.time(), tzinfo=timezone.utc
+    )
+
+    yesterday_end = yesterday_start + timedelta(days=1)
+
+    return yesterday_start, yesterday_end
+
+
 def get_frequent_foods(user_id: str) -> Set[MbdFood]:
     """
     Get foods that appear in >80% of the user's last 20 meals.
@@ -58,9 +68,7 @@ def get_frequent_foods(user_id: str) -> Set[MbdFood]:
         user_id: The user ID
 
     Returns:
-        A tuple containing:
-        - Set of food IDs that appear frequently
-        - Dictionary mapping food IDs to food objects
+        Set of food IDs that appear frequently
     """
     # Get the last 30 days of meals (to ensure we have enough)
     now = datetime.now()
@@ -88,34 +96,7 @@ def get_frequent_foods(user_id: str) -> Set[MbdFood]:
     frequent_foods = {
         frequent_foods_map[food_id]
         for food_id, count in food_counter.items()
-        if count >= len(last_20_meals) * 0.8
+        if count >= len(last_20_meals) * 0.6
     }
 
     return frequent_foods
-
-
-def convert_food_ids_to_objects(
-    food_ids: Set[str],
-    yesterday_foods_map: Dict[str, MbdFood],
-    frequent_foods_map: Dict[str, MbdFood],
-) -> List[MbdFood]:
-    """
-    Convert food IDs to food objects, prioritizing foods from yesterday.
-
-    Args:
-        food_ids: Set of food IDs to convert
-        yesterday_foods_map: Dictionary mapping food IDs to food objects from yesterday
-        frequent_foods_map: Dictionary mapping food IDs to food objects from frequent meals
-
-    Returns:
-        A list of food objects
-    """
-    suggested_foods = []
-    for food_id in food_ids:
-        # Try to get the food from either map, prioritizing yesterday's foods
-        if food_id in yesterday_foods_map:
-            suggested_foods.append(yesterday_foods_map[food_id])
-        elif food_id in frequent_foods_map:
-            suggested_foods.append(frequent_foods_map[food_id])
-
-    return suggested_foods

@@ -1,4 +1,5 @@
 import os
+import logging
 from dotenv import load_dotenv
 from pynamodb.models import Model
 from pynamodb.attributes import (
@@ -7,7 +8,6 @@ from pynamodb.attributes import (
     ListAttribute,
     MapAttribute,
 )
-import logging
 
 logger = logging.getLogger("uvicorn.error")
 logger.setLevel(logging.INFO)

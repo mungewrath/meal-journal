@@ -4,7 +4,6 @@ import {
   Accordion,
   AccordionSummary,
   AccordionDetails,
-  TextField,
   Select,
   MenuItem,
   FormControl,
@@ -15,8 +14,6 @@ import {
 } from "@mui/material";
 import { SelectChangeEvent } from "@mui/material/Select";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import DeleteIcon from "@mui/icons-material/Delete";
-import SaveIcon from "@mui/icons-material/Save";
 import RestaurantIcon from "@mui/icons-material/Restaurant";
 import HealingIcon from "@mui/icons-material/Healing";
 import { useState, useEffect, useMemo } from "react";
@@ -37,6 +34,8 @@ import {
   clearError as clearSuggestedFoodsError,
 } from "@/lib/features/foods/foodsSlice";
 import { useAuth } from "react-oidc-context";
+import { FormControls } from "./FormControls";
+import { DateTimeSelectorControls } from "./DateTimeSelectorControls";
 
 interface Item {
   id: string;
@@ -214,32 +213,13 @@ export const AddEntryComponent = () => {
               Symptom
             </Button>
           </Box>
-          <Box
-            sx={{
-              display: "flex",
-              flexDirection: { xs: "column", sm: "row" },
-              gap: 2,
-            }}
-          >
-            <TextField
-              label="Date"
-              type="date"
-              value={date}
-              onChange={handleDateChange}
-              slotProps={{ inputLabel: { shrink: true } }}
-              sx={{ flexGrow: 1 }}
-              disabled={saving}
-            />
-            <TextField
-              label="Time"
-              type="time"
-              value={time}
-              onChange={handleTimeChange}
-              slotProps={{ inputLabel: { shrink: true } }}
-              sx={{ flexGrow: 1 }}
-              disabled={saving}
-            />
-          </Box>
+          <DateTimeSelectorControls
+            date={date}
+            time={time}
+            onDateChange={handleDateChange}
+            onTimeChange={handleTimeChange}
+            disabled={saving}
+          />
           {selectedOption === "meal" ? (
             <>
               <FormControl>
@@ -277,31 +257,18 @@ export const AddEntryComponent = () => {
               label="Symptom"
             />
           )}
-          <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-            <Button
-              variant="contained"
-              color="secondary"
-              startIcon={<DeleteIcon />}
-              onClick={handleClear}
-              disabled={saving}
-            >
-              Clear
-            </Button>
-            <Button
-              variant="contained"
-              color="primary"
-              startIcon={saving ? <CircularProgress size={20} /> : <SaveIcon />}
-              onClick={handleSave}
-              disabled={
-                saving ||
-                !entryName ||
-                !date ||
-                mergedSelectedItems.filter((f) => f.selected).length === 0
-              }
-            >
-              {saving ? "Saving..." : "Save"}
-            </Button>
-          </Box>
+          <FormControls
+            disabled={
+              saving ||
+              !entryName ||
+              !date ||
+              !time ||
+              mergedSelectedItems.filter((f) => f.selected).length === 0
+            }
+            saving={saving}
+            onSave={handleSave}
+            onClear={handleClear}
+          />
         </Box>
       </AccordionDetails>
     </Accordion>

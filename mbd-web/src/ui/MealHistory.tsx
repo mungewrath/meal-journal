@@ -36,7 +36,6 @@ export const MealHistory = () => {
 
   useEffect(() => {
     if (auth.isAuthenticated && idToken) {
-      // Test data in chumpy user has meals logged 2/21 and 2/23
       dispatch(
         fetchMeals({ days: INITIAL_MEAL_DAYS_FETCHED, offset: 0, idToken })
       );
@@ -44,7 +43,7 @@ export const MealHistory = () => {
   }, [dispatch, auth, idToken]);
 
   // TODO: Currently assumes that the day does not change. If you reload the page at midnight, you end up with incorrect results
-  const handleFetchMeals = () => {
+  const handleFetchMoreMeals = () => {
     dispatch(
       fetchMeals({
         days: MEAL_DAYS_PER_FETCH,
@@ -116,7 +115,7 @@ export const MealHistory = () => {
       {!loading && (
         <Box display="flex" justifyContent="center" mt={2}>
           <Button
-            onClick={handleFetchMeals}
+            onClick={handleFetchMoreMeals}
             variant="contained"
             color="primary"
           >

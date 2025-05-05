@@ -59,3 +59,7 @@ resource "aws_dynamodb_table" "mbd_symptoms" {
     type = "S"
   }
 }
+
+# Whenever adding new tables, update the following in Lambda side:
+# 1. Environment variable for the table name
+# 2. IAM policy for the Lambda function to access the new table

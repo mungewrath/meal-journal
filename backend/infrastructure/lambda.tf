@@ -79,6 +79,19 @@ resource "aws_iam_policy" "lambda_dynamodb_access" {
         ]
         Resource = aws_dynamodb_table.mbd_foods.arn
       },
+
+      {
+        Effect = "Allow"
+        Action = [
+          "dynamodb:PutItem",
+          "dynamodb:GetItem",
+          "dynamodb:UpdateItem",
+          "dynamodb:DeleteItem",
+          "dynamodb:Scan",
+          "dynamodb:Query"
+        ]
+        Resource = aws_dynamodb_table.mbd_symptoms.arn
+      },
     ]
   })
 }

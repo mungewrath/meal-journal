@@ -105,7 +105,7 @@ resource "aws_lambda_function" "mbd_api_lambda_handler" {
       PREFERENCES_DB_NAME = aws_dynamodb_table.mbd_user_preferences.name
       MEALS_DB_NAME       = aws_dynamodb_table.mbd_meals.name
       FOODS_DB_NAME       = aws_dynamodb_table.mbd_foods.name
-      # SYMPTOMS_DB_NAME    = aws_dynamodb_table.mbd_symptoms.name
+      SYMPTOMS_DB_NAME    = aws_dynamodb_table.mbd_symptoms.name
       CORS_ALLOWED_ORIGINS = join(",", [
         "http://localhost:3000", # Always allow localhost for development
         "https://${aws_cloudfront_distribution.mbd_web_distribution.domain_name}"

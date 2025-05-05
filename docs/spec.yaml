@@ -51,7 +51,8 @@ components:
       type: object
       properties:
         symptoms:
-          type: string
+          type: array
+          items: string
           description: List of symptoms experienced
         dateTime:
           type: string

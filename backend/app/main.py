@@ -12,8 +12,10 @@ from mangum import Mangum
 from dto.food_create import FoodCreate
 from dto.meal_create import MealCreate
 from dto.preferences_update import PreferencesUpdate
+from dto.symptoms_create import SymptomsCreate
 from foods.food import MbdFood, MbdFoodList
 from meals.meal import MbdMeal
+from symptoms.symptoms import MbdSymptomsEntry
 from shared.auth import get_user_id
 from preferences.preferences import MbdPreferences
 from dotenv import load_dotenv
@@ -231,3 +233,43 @@ async def get_suggested_foods_endpoint(
     user_id = get_user_id(authorization)
     suggested_foods = get_suggested_foods(user_id, meal_type)
     return [food.to_dto() for food in suggested_foods]
+
+
+@app.post("/symptoms")
+async def save_symptoms(
+    request: SymptomsCreate,
+    authorization: Annotated[str | None, Header()] = None,
+) -> dict:
+    user_id = get_user_id(authorization)
+
+    symptom_entry = MbdSymptomsEntry(
+        user_id=user_id,
+        date_time=request.date_time,
+        symptoms=request.symptoms,
+    )
+    symptom_entry.save()
+
+    return symptom_entry.to_dto()
+
+
+@app.get("/symptoms/history")
+async def get_symptom_history(
+    days: int = 3,
+    offset: int = 0,
+    authorization: Annotated[str | None, Header()] = None,
+) -> list[dict]:
+    user_id = get_user_id(authorization)
+    symptom_entries = MbdSymptomsEntry.query(
+        hash_key=user_id,
+        range_key_condition=MbdSymptomsEntry.date_time.between(
+            datetime.now(timezone.utc) - timedelta(days=days + offset),
+            datetime.now(timezone.utc) - timedelta(days=offset),
+        ),
+    )
+
+    return [
+        entry.to_dto()
+        for entry in sorted(
+            symptom_entries, key=lambda entry: entry.date_time, reverse=True
+        )
+    ]

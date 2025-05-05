@@ -69,7 +69,12 @@ export const mealsSlice = createAppSlice({
       })
       .addCase(saveMeal.fulfilled, (state, action) => {
         state.saving = false;
-        state.meals = [action.payload, ...state.meals];
+        // TODO: Match the backend format. This needs to be updated before we can display correct times
+        const dateTime = `${action.payload.dateTime}+00:00`;
+        state.meals = [
+          { ...action.payload, dateTime: dateTime },
+          ...state.meals,
+        ];
       })
       .addCase(saveMeal.rejected, (state, action) => {
         state.saving = false;

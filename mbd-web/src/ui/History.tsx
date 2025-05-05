@@ -6,10 +6,8 @@ import {
   Typography,
   CircularProgress,
   Button,
-  Chip,
   Alert,
 } from "@mui/material";
-import MedicalInformationIcon from "@mui/icons-material/MedicalInformation";
 import { useAppSelector, useAppDispatch } from "@/lib/hooks";
 import { useAuth } from "react-oidc-context";
 import { Meal } from "@/lib/features/meals/models";
@@ -35,6 +33,8 @@ import {
   INITIAL_MEAL_DAYS_FETCHED,
   MEAL_DAYS_PER_FETCH,
 } from "@/lib/features/meals/mealsConstants";
+import { MealHistoryEntryComponent } from "./MealHistoryEntryComponent";
+import { SymptomHistoryEntryComponent } from "./SymptomHistoryEntryComponent";
 
 // Use the same constants for symptoms
 const INITIAL_SYMPTOMS_DAYS_FETCHED = INITIAL_MEAL_DAYS_FETCHED;
@@ -122,38 +122,6 @@ export const History = () => {
       symptomsDaysLoaded > 0 ? symptomsDaysLoaded : Infinity
     ) || 0;
 
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    const today = new Date();
-    const yesterday = new Date(today);
-    yesterday.setDate(today.getDate() - 1);
-
-    if (date.toDateString() === today.toDateString()) {
-      return `Today ${date.toLocaleDateString("en-US", {
-        month: "numeric",
-        day: "numeric",
-      })}`;
-    } else if (date.toDateString() === yesterday.toDateString()) {
-      return `Yesterday ${date.toLocaleDateString("en-US", {
-        month: "numeric",
-        day: "numeric",
-      })}`;
-    } else {
-      return `${date.toLocaleDateString("en-US", { weekday: "short" })} ${date.toLocaleDateString(
-        "en-US",
-        {
-          month: "numeric",
-          day: "numeric",
-        }
-      )}`;
-    }
-  };
-
-  const formatTime = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
-  };
-
   return (
     <Box sx={{ overflow: "auto" }}>
       {mealsLoadError && (
@@ -172,65 +140,15 @@ export const History = () => {
 
       {combinedHistory.map((entry, index) =>
         entry.type === "meal" ? (
-          // Meal entry
-          <Box
-            key={`meal-${(entry.content as Meal).id}`}
-            my={2}
-            p={2}
-            border={1}
-            borderRadius={3}
-            bgcolor={"#f0fff8"}
-          >
-            <Typography variant="h6">
-              <span title={formatTime(entry.dateTime)}>
-                {(entry.content as Meal).mealType}
-              </span>{" "}
-              <span title={new Date(entry.dateTime).toLocaleDateString()}>
-                {formatDate(entry.dateTime)}
-              </span>
-            </Typography>
-            <Box mt={1} display="flex" flexWrap="wrap" gap={1}>
-              {(entry.content as Meal).foods.map((food) => (
-                <Chip
-                  key={food.id}
-                  label={`${food.name} ${food.thumbnail}`.trim()}
-                />
-              ))}
-            </Box>
-          </Box>
+          <MealHistoryEntryComponent
+            key={`meal-${index}-${entry.dateTime}`}
+            meal={entry.content as Meal}
+          />
         ) : (
-          // Symptom entry
-          <Box
+          <SymptomHistoryEntryComponent
             key={`symptom-${index}-${entry.dateTime}`}
-            my={2}
-            p={2}
-            border={1}
-            borderRadius={3}
-            bgcolor={"#f8f0f0"} // Light reddish background for symptoms
-          >
-            <Typography
-              variant="h6"
-              sx={{ display: "flex", alignItems: "center" }}
-            >
-              <MedicalInformationIcon sx={{ mr: 1, color: "#d32f2f" }} />
-              <span title={formatTime(entry.dateTime)}>Symptoms</span>
-              <span title={new Date(entry.dateTime).toLocaleDateString()}>
-                &nbsp;{formatDate(entry.dateTime)}
-              </span>
-            </Typography>
-            <Box mt={1} display="flex" flexWrap="wrap" gap={1}>
-              {(entry.content as SymptomsEntry).symptoms.map(
-                (symptom: string, idx: number) => (
-                  <Chip
-                    key={`${symptom}-${idx}`}
-                    label={symptom}
-                    color="error"
-                    variant="outlined"
-                  />
-                )
-              )}
-            </Box>
-          </Box>
+            symptom={entry.content as SymptomsEntry}
+          />
         )
       )}
 

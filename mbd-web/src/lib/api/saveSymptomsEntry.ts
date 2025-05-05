@@ -31,10 +31,10 @@ export const saveSymptomsApi = async ({
     );
 
     const savedSymptoms = response.data;
-    // Transform the response to match the expected format
+
     return {
       symptoms: savedSymptoms.symptoms,
-      dateTime: savedSymptoms.date_time,
+      dateTime: savedSymptoms.dateTime,
     };
   } catch (error) {
     console.error("Error saving symptoms entry:", error);

@@ -9,3 +9,8 @@ export interface ApiMeal {
   dateTime: string;
   foods: ApiFood[];
 }
+
+export interface ApiSymptomsEntry {
+  dateTime: string;
+  symptoms: string[];
+}

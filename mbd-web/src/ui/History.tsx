@@ -43,7 +43,7 @@ const SYMPTOMS_DAYS_PER_FETCH = MEAL_DAYS_PER_FETCH;
 // Type to represent both meals and symptoms for combined display
 interface HistoryEntry {
   type: "meal" | "symptom";
-  dateTime: string;
+  dateTime: Date;
   content: Meal | SymptomsEntry;
 }
 
@@ -111,9 +111,7 @@ export const History = () => {
         content: symptom,
       })
     ),
-  ].sort(
-    (a, b) => new Date(b.dateTime).getTime() - new Date(a.dateTime).getTime()
-  );
+  ].sort((a, b) => b.dateTime.getTime() - a.dateTime.getTime());
 
   const loading = mealsLoading || symptomsLoading;
   const daysLoaded =

@@ -21,8 +21,8 @@ export const fetchSymptoms = createAsyncThunk(
   }
 );
 
-interface SymptomsState {
-  symptomsEntries: SymptomsEntry[];
+interface SymptomsSliceState {
+  symptomsEntries: SymptomsEntryState[];
   loading: boolean;
   daysLoaded: number;
   saving: boolean;
@@ -30,7 +30,27 @@ interface SymptomsState {
   loadError: string | null;
 }
 
-const initialState: SymptomsState = {
+export interface SymptomsEntryState {
+  dateTime: string;
+  symptoms: string[];
+}
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const symptomsEntryFromDomain = (domain: SymptomsEntry): SymptomsEntryState => {
+  return {
+    dateTime: domain.dateTime.toISOString(),
+    symptoms: domain.symptoms,
+  };
+};
+
+const symptomsEntryToDomain = (entry: SymptomsEntryState): SymptomsEntry => {
+  return {
+    dateTime: new Date(entry.dateTime),
+    symptoms: entry.symptoms,
+  };
+};
+
+const initialState: SymptomsSliceState = {
   symptomsEntries: [],
   loading: false,
   daysLoaded: 0,
@@ -59,8 +79,10 @@ export const symptomsSlice = createAppSlice({
       .addCase(saveSymptomsEntry.fulfilled, (state, action) => {
         state.saving = false;
         console.log("Raw datetime:", action.payload.dateTime);
-        // TODO: Match the backend format. This needs to be updated before we can display correct times
-        const dateTime = `${action.payload.dateTime}+00:00`;
+        // TODO: Convert from the backend format. This needs to be updated before we can display correct times
+        const dateTime = new Date(
+          `${action.payload.dateTime}-07:00`
+        ).toISOString();
         console.log("Saved symptoms entry with dateTime:", dateTime);
         console.log("Current symptoms entries:", ...state.symptomsEntries);
         state.symptomsEntries = [
@@ -88,7 +110,8 @@ export const symptomsSlice = createAppSlice({
       });
   },
   selectors: {
-    selectSymptomsEntries: (state) => state.symptomsEntries,
+    selectSymptomsEntries: (state) =>
+      state.symptomsEntries.map((entry) => symptomsEntryToDomain(entry)),
     selectLoading: (state) => state.loading,
     selectDaysLoaded: (state) => state.daysLoaded,
     selectSaving: (state) => state.saving,

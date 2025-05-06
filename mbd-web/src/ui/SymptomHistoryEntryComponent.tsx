@@ -10,18 +10,24 @@ export const SymptomHistoryEntryComponent = ({
 }) => {
   return (
     <Box
-      //   key={`symptom-${index}-${entry.dateTime}`}
       my={2}
       p={2}
       border={1}
       borderRadius={3}
       bgcolor={"#f8f0f0"} // Light reddish background for symptoms
     >
-      <Typography variant="h6" sx={{ display: "flex", alignItems: "center" }}>
+      <Typography variant="h6">
         <MedicalInformationIcon sx={{ mr: 1, color: "#d32f2f" }} />
-        <span title={formatTime(symptom.dateTime)}>Symptoms</span>
-        <span title={new Date(symptom.dateTime).toLocaleDateString()}>
-          &nbsp;{formatDate(symptom.dateTime)}
+        <span>Symptoms, {formatDate(symptom.dateTime)}</span>
+        <span
+          style={{
+            color: "#999",
+            marginLeft: "10px",
+            fontWeight: "lighter",
+            float: "right",
+          }}
+        >
+          {formatTime(symptom.dateTime)}
         </span>
       </Typography>
       <Box mt={1} display="flex" flexWrap="wrap" gap={1}>

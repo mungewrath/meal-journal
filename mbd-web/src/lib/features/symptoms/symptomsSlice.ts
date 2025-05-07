@@ -6,6 +6,8 @@ import { fetchSymptomsApi, FetchSymptomsParams } from "@/lib/api/fetchSymptoms";
 import { createAppSlice } from "@/lib/createAppSlice";
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { SymptomsEntry } from "./models";
+import { ApiSymptomsEntry } from "@/lib/api/contracts";
+import { convertFromApiDate } from "@/lib/utils/dateUtils";
 
 export const saveSymptomsEntry = createAsyncThunk(
   "symptoms/saveSymptoms",
@@ -38,6 +40,7 @@ export interface SymptomsEntryState {
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 const symptomsEntryFromDomain = (domain: SymptomsEntry): SymptomsEntryState => {
   return {
+    // TODO: Convert from the backend format. This needs to be updated before we can display correct times
     dateTime: domain.dateTime.toISOString(),
     symptoms: domain.symptoms,
   };
@@ -47,6 +50,15 @@ const symptomsEntryToDomain = (entry: SymptomsEntryState): SymptomsEntry => {
   return {
     dateTime: new Date(entry.dateTime),
     symptoms: entry.symptoms,
+  };
+};
+
+const symptomsEntryFromApi = (
+  apiEntry: ApiSymptomsEntry
+): SymptomsEntryState => {
+  return {
+    dateTime: convertFromApiDate(apiEntry.date_time),
+    symptoms: apiEntry.symptoms,
   };
 };
 
@@ -78,15 +90,8 @@ export const symptomsSlice = createAppSlice({
       })
       .addCase(saveSymptomsEntry.fulfilled, (state, action) => {
         state.saving = false;
-        console.log("Raw datetime:", action.payload.dateTime);
-        // TODO: Convert from the backend format. This needs to be updated before we can display correct times
-        const dateTime = new Date(
-          `${action.payload.dateTime}-07:00`
-        ).toISOString();
-        console.log("Saved symptoms entry with dateTime:", dateTime);
-        console.log("Current symptoms entries:", ...state.symptomsEntries);
         state.symptomsEntries = [
-          { ...action.payload, dateTime: dateTime },
+          symptomsEntryFromApi(action.payload),
           ...state.symptomsEntries,
         ];
       })

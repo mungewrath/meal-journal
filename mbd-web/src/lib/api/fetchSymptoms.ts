@@ -26,7 +26,7 @@ export const fetchSymptomsApi = async ({
     return response.data.map(
       (symptomEntry: ApiSymptomsEntry): SymptomsEntryState => ({
         dateTime: new Date(
-          symptomEntry.dateTime.replace("+00:00", "-07:00")
+          symptomEntry.date_time.replace("+00:00", "-07:00")
         ).toISOString(), // // Hard-code timezone offset until backend is timezone aware
         symptoms: symptomEntry.symptoms,
       })

@@ -3,6 +3,8 @@ import { createAsyncThunk } from "@reduxjs/toolkit";
 import { fetchMealsApi, FetchMealsParams } from "@/lib/api/fetchMeals";
 import { saveMealApi, SaveMealParams } from "@/lib/api/saveMeal";
 import { Meal } from "./models";
+import { ApiMeal } from "@/lib/api/contracts";
+import { convertFromApiDate } from "@/lib/utils/dateUtils";
 
 export const fetchMeals = createAsyncThunk(
   "meals/fetchMeals",
@@ -57,6 +59,18 @@ const mealToDomain = (meal: MealState): Meal => {
   };
 };
 
+const mealFromApi = (apiMeal: ApiMeal): MealState => {
+  return {
+    id: `${apiMeal.meal_type}-${apiMeal.date_time}`,
+    mealType: apiMeal.meal_type,
+    dateTime: convertFromApiDate(apiMeal.date_time),
+    foods: apiMeal.foods.map((food) => ({
+      id: food.food_id!,
+      ...food,
+    })),
+  };
+};
+
 interface FoodState {
   id: string;
   name: string;
@@ -106,12 +120,7 @@ export const mealsSlice = createAppSlice({
       })
       .addCase(saveMeal.fulfilled, (state, action) => {
         state.saving = false;
-        // TODO: Match the backend format. This needs to be updated before we can display correct times
-        const dateTime = `${action.payload.dateTime}-07:00`;
-        state.meals = [
-          { ...action.payload, dateTime: dateTime },
-          ...state.meals,
-        ];
+        state.meals = [mealFromApi(action.payload), ...state.meals];
       })
       .addCase(saveMeal.rejected, (state, action) => {
         state.saving = false;

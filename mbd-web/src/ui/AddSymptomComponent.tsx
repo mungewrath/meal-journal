@@ -9,6 +9,7 @@ import {
   selectSaving as selectSymptomSaving,
   selectSaveError,
 } from "@/lib/features/symptoms/symptomsSlice";
+import { convertToApiDate } from "@/lib/utils/dateUtils";
 
 interface Symptom {
   name: string;
@@ -66,7 +67,7 @@ export const AddSymptomComponent = ({}) => {
           symptoms: selectedItems
             .filter((symptom) => symptom.selected)
             .map((item) => item.name),
-          dateTime,
+          date_time: convertToApiDate(new Date(dateTime)),
         },
         idToken: auth.user.id_token,
       })

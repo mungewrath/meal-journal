@@ -20,20 +20,75 @@ interface Item {
 // Temporary placeholder data - will be replaced with API call
 const placeholderItems: Record<string, Item[]> = {
   food: [
-    { id: "1", name: "Apple", suggested: false, selected: true },
-    { id: "2", name: "Banana", suggested: false, selected: true },
-    { id: "3", name: "Chicken", suggested: false, selected: true },
-    { id: "4", name: "Rice", suggested: false, selected: true },
-    { id: "5", name: "Salmon", suggested: false, selected: true },
-    { id: "6", name: "Broccoli", suggested: false, selected: true },
+    {
+      id: crypto.randomUUID(),
+      name: "Apple",
+      suggested: false,
+      selected: true,
+    },
+    {
+      id: crypto.randomUUID(),
+      name: "Banana",
+      suggested: false,
+      selected: true,
+    },
+    {
+      id: crypto.randomUUID(),
+      name: "Chicken",
+      suggested: false,
+      selected: true,
+    },
+    { id: crypto.randomUUID(), name: "Rice", suggested: false, selected: true },
+    {
+      id: crypto.randomUUID(),
+      name: "Salmon",
+      suggested: false,
+      selected: true,
+    },
+    {
+      id: crypto.randomUUID(),
+      name: "Broccoli",
+      suggested: false,
+      selected: true,
+    },
   ],
   symptom: [
-    { id: "1", name: "Headache", suggested: false, selected: true },
-    { id: "2", name: "Nausea", suggested: false, selected: true },
-    { id: "3", name: "Fatigue", suggested: false, selected: true },
-    { id: "4", name: "Bloating", suggested: false, selected: true },
-    { id: "5", name: "Dizziness", suggested: false, selected: true },
-    { id: "6", name: "Heartburn", suggested: false, selected: true },
+    {
+      id: crypto.randomUUID(),
+      name: "Headache",
+      suggested: false,
+      selected: true,
+    },
+    {
+      id: crypto.randomUUID(),
+      name: "Nausea",
+      suggested: false,
+      selected: true,
+    },
+    {
+      id: crypto.randomUUID(),
+      name: "Fatigue",
+      suggested: false,
+      selected: true,
+    },
+    {
+      id: crypto.randomUUID(),
+      name: "Bloating",
+      suggested: false,
+      selected: true,
+    },
+    {
+      id: crypto.randomUUID(),
+      name: "Dizziness",
+      suggested: false,
+      selected: true,
+    },
+    {
+      id: crypto.randomUUID(),
+      name: "Heartburn",
+      suggested: false,
+      selected: true,
+    },
   ],
 };
 
@@ -143,7 +198,7 @@ export const AddItemsComponent = ({
           if (inputValue !== "" && !isExisting && !isSelected) {
             filtered.push({
               name: inputValue,
-              id: `new-${inputValue}`,
+              id: crypto.randomUUID(),
               isNew: true,
               suggested: false,
               selected: true,

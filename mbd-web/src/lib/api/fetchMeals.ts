@@ -1,6 +1,7 @@
 import axiosInstance from "./axios";
 import { ApiMeal } from "./contracts";
 import { MealState } from "../features/meals/mealsSlice";
+import { convertFromApiDate } from "../utils/dateUtils";
 
 export interface FetchMealsParams {
   days: number;
@@ -26,11 +27,9 @@ export const fetchMealsApi = async ({
     // Transform the response to match the expected format
     return response.data.map(
       (meal: ApiMeal): MealState => ({
-        id: `${meal.mealType}-${meal.dateTime}`, // Generate an ID since backend doesn't provide one
-        mealType: meal.mealType,
-        dateTime: new Date(
-          meal.dateTime.replace("+00:00", "-07:00")
-        ).toISOString(), // Hard-code timezone offset until backend is timezone aware
+        id: `${meal.meal_type}-${meal.date_time}`, // Generate an ID since backend doesn't provide one
+        mealType: meal.meal_type,
+        dateTime: convertFromApiDate(meal.date_time),
         foods: meal.foods.map((food) => ({
           id: food.food_id!,
           name: food.name,

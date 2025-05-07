@@ -18,7 +18,7 @@ async def test_create_food__returns_new_food(mock_get, client, mock_get_user_id)
         "/foods",
         headers={"Authorization": "Bearer test-token"},
         json={
-            "id": new_food_id,
+            "food_id": new_food_id,
             "name": "Blueberries",
             "thumbnail": "🫐",
         },
@@ -58,7 +58,7 @@ async def test_create_food__returns_bad_request_if_food_exists(
         "/foods",
         headers={"Authorization": "Bearer test-token"},
         json={
-            "id": str(uuid4()),
+            "food_id": str(uuid4()),
             "name": "Blueberries",
             "thumbnail": "🫐",
         },
@@ -93,7 +93,7 @@ async def test_create_food__returns_bad_request_if_food_exists_ignoring_case(
         "/foods",
         headers={"Authorization": "Bearer test-token"},
         json={
-            "id": str(uuid4()),
+            "food_id": str(uuid4()),
             "name": "BLUEBERRIES",
             "thumbnail": "🫐",
         },

@@ -1,6 +1,7 @@
 import axiosInstance from "./axios";
 import { SymptomsEntryState } from "../features/symptoms/symptomsSlice";
 import { ApiSymptomsEntry } from "./contracts";
+import { convertFromApiDate } from "../utils/dateUtils";
 
 export interface FetchSymptomsParams {
   days: number;
@@ -25,9 +26,7 @@ export const fetchSymptomsApi = async ({
 
     return response.data.map(
       (symptomEntry: ApiSymptomsEntry): SymptomsEntryState => ({
-        dateTime: new Date(
-          symptomEntry.date_time.replace("+00:00", "-07:00")
-        ).toISOString(), // // Hard-code timezone offset until backend is timezone aware
+        dateTime: convertFromApiDate(symptomEntry.date_time),
         symptoms: symptomEntry.symptoms,
       })
     );

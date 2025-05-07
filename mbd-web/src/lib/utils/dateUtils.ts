@@ -40,7 +40,5 @@ export const convertToApiDate = (date: Date): string => {
 // Takes sample dates like "2025-05-04T09:35:00+00:00" from the API, and standardizes it to pacific time.
 // TODO: This is a temporary fix. We should handle time zones properly in the future.
 export const convertFromApiDate = (dateString: string): string => {
-  dateString.replace("+00:00", "-07:00");
-  const offsetDate = new Date(dateString).toISOString();
-  return offsetDate;
+  return new Date(dateString.replace("+00:00", "-07:00")).toISOString();
 };

@@ -24,7 +24,7 @@ import {
   selectSaving as selectMealSaving,
   selectSaveError,
 } from "@/lib/features/meals/mealsSlice";
-import { convertToApiDate } from "@/lib/utils/dateUtils";
+import { convertToApiDateTime } from "@/lib/utils/dateUtils";
 
 interface Item {
   id: string;
@@ -115,7 +115,9 @@ export const AddMealComponent = ({}) => {
       saveMeal({
         meal: {
           meal_type: entryName,
-          date_time: convertToApiDate(new Date(`${date}T${time || "00:00"}`)),
+          date_time: convertToApiDateTime(
+            new Date(`${date}T${time || "00:00"}`)
+          ),
           foods: selectedItems
             .filter((food) => food.selected)
             .map((item) => ({

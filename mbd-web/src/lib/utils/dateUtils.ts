@@ -28,9 +28,16 @@ export const formatTime = (date: Date) => {
   return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
 };
 
-// TODO: Account for timezone once backend has had existing entries migrated
-export const convertToApiDate = (date: Date): string => {
-  const formattedDate = `${date.toISOString().split("T")[0]}T${
+const convertToApiDate = (date: Date): string => {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0"); // Months are 0-indexed
+  const day = String(date.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+};
+
+// TODO: Can be simplified to just use ISO strings once backend has had existing entries migrated to the correct timezone
+export const convertToApiDateTime = (date: Date): string => {
+  const formattedDate = `${convertToApiDate(date)}T${
     date.toTimeString().split(" ")[0]
   }`;
 

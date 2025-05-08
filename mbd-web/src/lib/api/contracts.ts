@@ -1,6 +1,6 @@
 import { Food, Meal } from "../features/meals/models";
 import { SymptomsEntry } from "../features/symptoms/models";
-import { convertToApiDate } from "../utils/dateUtils";
+import { convertToApiDateTime } from "../utils/dateUtils";
 
 export interface ApiFood {
   food_id: string;
@@ -27,13 +27,13 @@ export const toApiFood = (food: Food): ApiFood => ({
 
 export const toApiMeal = (meal: Meal): ApiMeal => ({
   meal_type: meal.mealType,
-  date_time: convertToApiDate(meal.dateTime),
+  date_time: convertToApiDateTime(meal.dateTime),
   foods: meal.foods.map(toApiFood),
 });
 
 export const toApiSymptomsEntry = (
   symptomsEntry: SymptomsEntry
 ): ApiSymptomsEntry => ({
-  date_time: convertToApiDate(symptomsEntry.dateTime),
+  date_time: convertToApiDateTime(symptomsEntry.dateTime),
   symptoms: symptomsEntry.symptoms,
 });

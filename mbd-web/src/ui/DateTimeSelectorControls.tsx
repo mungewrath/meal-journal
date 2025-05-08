@@ -30,7 +30,7 @@ export const DateTimeSelectorControls = ({
         sx={{
           flexGrow: 1,
           input: {
-            minHeight: "1em",
+            minHeight: "1.5em",
           },
         }}
         disabled={disabled}
@@ -44,7 +44,7 @@ export const DateTimeSelectorControls = ({
         sx={{
           flexGrow: 1,
           input: {
-            minHeight: "1em",
+            minHeight: "1.5em",
           },
         }}
         disabled={disabled}

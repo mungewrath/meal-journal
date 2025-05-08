@@ -8,6 +8,6 @@ export interface Food {
 export interface Meal {
   id: string;
   mealType: string;
-  dateTime: string;
+  dateTime: Date;
   foods: Food[];
 }

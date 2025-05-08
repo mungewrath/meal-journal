@@ -27,7 +27,12 @@ export const DateTimeSelectorControls = ({
         value={date}
         onChange={onDateChange}
         slotProps={{ inputLabel: { shrink: true } }}
-        sx={{ flexGrow: 1 }}
+        sx={{
+          flexGrow: 1,
+          input: {
+            minHeight: "1.5em",
+          },
+        }}
         disabled={disabled}
       />
       <TextField
@@ -36,7 +41,12 @@ export const DateTimeSelectorControls = ({
         value={time}
         onChange={onTimeChange}
         slotProps={{ inputLabel: { shrink: true } }}
-        sx={{ flexGrow: 1 }}
+        sx={{
+          flexGrow: 1,
+          input: {
+            minHeight: "1.5em",
+          },
+        }}
         disabled={disabled}
       />
     </Box>

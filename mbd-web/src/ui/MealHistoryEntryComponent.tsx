@@ -13,9 +13,18 @@ export const MealHistoryEntryComponent = ({ meal }: { meal: Meal }) => {
       bgcolor={"#f0fff8"}
     >
       <Typography variant="h6">
-        <span title={formatTime(meal.dateTime)}>{meal.mealType}</span>{" "}
-        <span title={new Date(meal.dateTime).toLocaleDateString()}>
-          {formatDate(meal.dateTime)}
+        <span>
+          {meal.mealType}, {formatDate(meal.dateTime)}
+        </span>
+        <span
+          style={{
+            color: "#999",
+            marginLeft: "10px",
+            fontWeight: "lighter",
+            float: "right",
+          }}
+        >
+          {formatTime(meal.dateTime)}
         </span>
       </Typography>
       <Box mt={1} display="flex" flexWrap="wrap" gap={1}>

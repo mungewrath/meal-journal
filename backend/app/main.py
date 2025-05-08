@@ -137,7 +137,7 @@ async def create_food(
         )
 
     food = MbdFood(
-        food_id=request.id,
+        food_id=request.food_id,
         name=request.name,
         thumbnail=request.thumbnail,
     )

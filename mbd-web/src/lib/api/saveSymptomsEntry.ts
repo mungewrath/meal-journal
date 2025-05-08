@@ -1,28 +1,19 @@
-import { SymptomsEntry } from "../features/symptoms/models";
 import axiosInstance from "./axios";
+import { ApiSymptomsEntry } from "./contracts";
 
 export interface SaveSymptomsParams {
-  symptomsEntry: {
-    symptoms: string[];
-    dateTime: string;
-  };
+  symptomsEntry: ApiSymptomsEntry;
   idToken: string;
 }
 
 export const saveSymptomsApi = async ({
   symptomsEntry,
   idToken,
-}: SaveSymptomsParams): Promise<SymptomsEntry> => {
+}: SaveSymptomsParams): Promise<ApiSymptomsEntry> => {
   try {
-    // Transform the symptoms data to match the backend's expected format
-    const backendSymptoms = {
-      symptoms: symptomsEntry.symptoms,
-      date_time: symptomsEntry.dateTime,
-    };
-
     const response = await axiosInstance.post(
       `/api/v1/symptoms`,
-      backendSymptoms,
+      symptomsEntry,
       {
         headers: {
           Authorization: `Bearer ${idToken}`,
@@ -34,7 +25,7 @@ export const saveSymptomsApi = async ({
 
     return {
       symptoms: savedSymptoms.symptoms,
-      dateTime: savedSymptoms.dateTime,
+      date_time: savedSymptoms.date_time,
     };
   } catch (error) {
     console.error("Error saving symptoms entry:", error);

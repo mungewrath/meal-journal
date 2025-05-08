@@ -1,8 +1,10 @@
 import { createAppSlice } from "@/lib/createAppSlice";
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import { Meal } from "./models";
 import { fetchMealsApi, FetchMealsParams } from "@/lib/api/fetchMeals";
 import { saveMealApi, SaveMealParams } from "@/lib/api/saveMeal";
+import { Meal } from "./models";
+import { ApiMeal } from "@/lib/api/contracts";
+import { convertFromApiDate } from "@/lib/utils/dateUtils";
 
 export const fetchMeals = createAsyncThunk(
   "meals/fetchMeals",
@@ -18,8 +20,8 @@ export const saveMeal = createAsyncThunk(
   }
 );
 
-interface MealsState {
-  meals: Meal[];
+interface MealsSliceState {
+  meals: MealState[];
   loading: boolean;
   daysLoaded: number;
   saving: boolean;
@@ -27,7 +29,56 @@ interface MealsState {
   loadError: string | null;
 }
 
-const initialState: MealsState = {
+export interface MealState {
+  id: string;
+  mealType: string;
+  dateTime: string;
+  foods: FoodState[];
+}
+
+// Function that takes in a Meal and returns a MealState with the dateTime converted to ISO string
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const mealFromDomain = (domain: Meal): MealState => {
+  return {
+    id: domain.id,
+    mealType: domain.mealType,
+    dateTime: domain.dateTime.toISOString(),
+    foods: domain.foods.map((food) => ({
+      ...food,
+    })),
+  };
+};
+
+const mealToDomain = (meal: MealState): Meal => {
+  return {
+    ...meal,
+    dateTime: new Date(meal.dateTime),
+    foods: meal.foods.map((food) => ({
+      ...food,
+    })),
+  };
+};
+
+const mealFromApi = (apiMeal: ApiMeal): MealState => {
+  return {
+    id: `${apiMeal.meal_type}-${apiMeal.date_time}`,
+    mealType: apiMeal.meal_type,
+    dateTime: convertFromApiDate(apiMeal.date_time),
+    foods: apiMeal.foods.map((food) => ({
+      id: food.food_id!,
+      ...food,
+    })),
+  };
+};
+
+interface FoodState {
+  id: string;
+  name: string;
+  thumbnail?: string;
+  isSuggested?: boolean;
+}
+
+const initialState: MealsSliceState = {
   meals: [],
   loading: false,
   daysLoaded: 0,
@@ -69,12 +120,7 @@ export const mealsSlice = createAppSlice({
       })
       .addCase(saveMeal.fulfilled, (state, action) => {
         state.saving = false;
-        // TODO: Match the backend format. This needs to be updated before we can display correct times
-        const dateTime = `${action.payload.dateTime}+00:00`;
-        state.meals = [
-          { ...action.payload, dateTime: dateTime },
-          ...state.meals,
-        ];
+        state.meals = [mealFromApi(action.payload), ...state.meals];
       })
       .addCase(saveMeal.rejected, (state, action) => {
         state.saving = false;
@@ -84,12 +130,13 @@ export const mealsSlice = createAppSlice({
       });
   },
   selectors: {
-    selectMeals: (state: MealsState) => state.meals,
-    selectLoading: (state: MealsState) => state.loading,
-    selectDaysLoaded: (state: MealsState) => state.daysLoaded,
-    selectSaving: (state: MealsState) => state.saving,
-    selectSaveError: (state: MealsState) => state.saveError,
-    selectLoadError: (state: MealsState) => state.loadError,
+    selectMeals: (state: MealsSliceState) =>
+      state.meals.map((m) => mealToDomain(m)),
+    selectLoading: (state: MealsSliceState) => state.loading,
+    selectDaysLoaded: (state: MealsSliceState) => state.daysLoaded,
+    selectSaving: (state: MealsSliceState) => state.saving,
+    selectSaveError: (state: MealsSliceState) => state.saveError,
+    selectLoadError: (state: MealsSliceState) => state.loadError,
   },
 });
 

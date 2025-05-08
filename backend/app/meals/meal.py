@@ -33,7 +33,7 @@ class MbdMeal(Model):
 
     def to_dto(self) -> dict:
         return {
-            "mealType": self.meal_type,
-            "dateTime": self.date_time.isoformat(),
+            "meal_type": self.meal_type,
+            "date_time": self.date_time.isoformat(),
             "foods": [food.to_dto() for food in self.foods],
         }

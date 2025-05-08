@@ -1,10 +1,7 @@
 import axiosInstance from "./axios";
-import { SymptomsEntry } from "../features/symptoms/models";
-
-interface ApiSymptomsEntry {
-  dateTime: string;
-  symptoms: string[];
-}
+import { SymptomsEntryState } from "../features/symptoms/symptomsSlice";
+import { ApiSymptomsEntry } from "./contracts";
+import { convertFromApiDate } from "../utils/dateUtils";
 
 export interface FetchSymptomsParams {
   days: number;
@@ -16,7 +13,7 @@ export const fetchSymptomsApi = async ({
   days,
   offset,
   idToken,
-}: FetchSymptomsParams): Promise<SymptomsEntry[]> => {
+}: FetchSymptomsParams): Promise<SymptomsEntryState[]> => {
   try {
     console.log(`Fetching symptoms with days: ${days}, offset: ${offset}`);
 
@@ -27,10 +24,12 @@ export const fetchSymptomsApi = async ({
       },
     });
 
-    return response.data.map((symptomEntry: ApiSymptomsEntry) => ({
-      dateTime: symptomEntry.dateTime,
-      symptoms: symptomEntry.symptoms,
-    }));
+    return response.data.map(
+      (symptomEntry: ApiSymptomsEntry): SymptomsEntryState => ({
+        dateTime: convertFromApiDate(symptomEntry.date_time),
+        symptoms: symptomEntry.symptoms,
+      })
+    );
   } catch (error) {
     console.error("Error fetching symptoms:", error);
     throw error;

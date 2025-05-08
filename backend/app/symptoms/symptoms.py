@@ -34,6 +34,6 @@ class MbdSymptomsEntry(Model):
 
     def to_dto(self) -> dict:
         return {
-            "dateTime": self.date_time.isoformat(),
+            "date_time": self.date_time.isoformat(),
             "symptoms": self.symptoms,
         }

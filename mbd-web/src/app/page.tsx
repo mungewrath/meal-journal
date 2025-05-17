@@ -18,7 +18,6 @@ export default function Home() {
     automaticSilentRenew: true,
     silent_redirect_uri: process.env.NEXT_PUBLIC_COGNITO_REDIRECT,
     accessTokenExpiringNotificationTimeInSeconds: 12 * 60 * 60,
-    // TODO: This seems to return a 500 on the first redirect. Why?
     userStore: new LocalStorageStateStore(),
   };
 

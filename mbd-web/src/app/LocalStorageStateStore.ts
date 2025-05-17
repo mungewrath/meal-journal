@@ -1,10 +1,11 @@
 import { StateStore } from "oidc-client-ts";
 
-// set(key: string, value: string): Promise<void>;
-//     get(key: string): Promise<string | null>;
-//     remove(key: string): Promise<string | null>;
-//     getAllKeys(): Promise<string[]>;
-
+/**
+ * A simple implementation of the StateStore interface that uses localStorage.
+ * This is a workaround for the fact that localStorage is not available in some environments (e.g., server-side rendering).
+ * @class LocalStorageStateStore
+ * @implements {StateStore}
+ */
 class LocalStorageStateStore implements StateStore {
   constructor() {
     if (typeof localStorage === "undefined") {

@@ -1,11 +1,12 @@
 "use client";
 import { AuthProvider } from "react-oidc-context";
-import { WebStorageStateStore } from "oidc-client-ts";
+// import { WebStorageStateStore } from "oidc-client-ts";
 import LoginPage from "@/ui/LoginPage";
 import { Box, Container, Typography } from "@mui/material";
 import { Header } from "./Header";
 import { AddEntryComponent } from "@/ui/AddEntryComponent";
 import { History } from "@/ui/History";
+import LocalStorageStateStore from "./LocalStorageStateStore";
 
 export default function Home() {
   const cognitoAuthConfig = {
@@ -17,7 +18,8 @@ export default function Home() {
     automaticSilentRenew: true,
     silent_redirect_uri: process.env.NEXT_PUBLIC_COGNITO_REDIRECT,
     accessTokenExpiringNotificationTimeInSeconds: 12 * 60 * 60,
-    userStore: new WebStorageStateStore({ store: window.localStorage }),
+    // TODO: This seems to return a 500 on the first redirect. Why?
+    userStore: new LocalStorageStateStore(),
   };
 
   return (

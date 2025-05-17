@@ -11,6 +11,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from mangum import Mangum
 from dto.food_create import FoodCreate
 from dto.meal_create import MealCreate
+from dto.meal_update import MealUpdate
 from dto.preferences_update import PreferencesUpdate
 from dto.symptoms_create import SymptomsCreate
 from foods.food import MbdFood, MbdFoodList
@@ -21,6 +22,7 @@ from preferences.preferences import MbdPreferences
 from dotenv import load_dotenv
 from foods.suggested import get_suggested_foods
 from shared.exceptions import MbdException
+from pynamodb.connection import Connection
 
 ENV = os.getenv("ENVIRONMENT")
 
@@ -202,6 +204,25 @@ async def save_meal(
     meal.save()
 
     return meal.to_dto()
+
+
+@app.put("/meals")
+async def update_meal(
+    request: MealUpdate,
+    authorization: Annotated[str | None, Header()] = None,
+) -> dict:
+    user_id = get_user_id(authorization)
+
+    connection = Connection()
+
+    updated_meal = MbdMeal.update_meal(
+        connection=connection,
+        user_id=user_id,
+        original_date_time=request.original_date_time,
+        new_meal=request,
+    )
+
+    return updated_meal.to_dto()
 
 
 @app.get("/meals/history")

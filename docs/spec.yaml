@@ -47,12 +47,28 @@ components:
         - dateTime
         - foods
 
+    MealUpdate:
+      type: object
+      allOf:
+        - $ref: "#/components/schemas/Meal"
+      properties:
+        originalDateTime:
+          type: string
+          format: date-time
+          description: The original date and time of the meal to be updated
+      required:
+        - originalDateTime
+        - mealType
+        - dateTime
+        - foods
+
     Symptoms:
       type: object
       properties:
         symptoms:
           type: array
-          items: string
+          items:
+            type: string
           description: List of symptoms experienced
         dateTime:
           type: string
@@ -229,6 +245,20 @@ paths:
                     type: string
         400:
           description: Invalid input
+    put:
+      summary: Update a meal entry
+      description: Updates an existing meal entry for the user.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MealUpdate"
+      responses:
+        200:
+          description: Meal updated successfully
+        400:
+          description: Invalid input
 
   /meals/history:
     get:
@@ -288,6 +318,13 @@ paths:
     get:
       summary: Get suggested foods
       description: Retrieves a list of suggested foods for the user's next meals, categorized by meal type
+      parameters:
+        - in: path
+          name: mealType
+          required: true
+          description: The type of meal (e.g., Lunch, Snack)
+          schema:
+            type: string
       responses:
         200:
           description: List of suggested foods

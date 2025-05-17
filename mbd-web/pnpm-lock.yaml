@@ -35,6 +35,9 @@ importers:
       next:
         specifier: 15.2.0
         version: 15.2.0(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
+      oidc-client-ts:
+        specifier: ^3.2.1
+        version: 3.2.1
       react:
         specifier: ^19.0.0
         version: 19.0.0
@@ -43,7 +46,7 @@ importers:
         version: 19.0.0(react@19.0.0)
       react-oidc-context:
         specifier: ^3.2.0
-        version: 3.2.0(oidc-client-ts@3.2.0)(react@19.0.0)
+        version: 3.2.0(oidc-client-ts@3.2.1)(react@19.0.0)
       react-redux:
         specifier: ^9.2.0
         version: 9.2.0(@types/react@19.0.10)(react@19.0.0)(redux@5.0.1)
@@ -1484,8 +1487,8 @@ packages:
     resolution: {integrity: sha512-gXah6aZrcUxjWg2zR2MwouP2eHlCBzdV4pygudehaKXSGW4v2AsRQUK+lwwXhii6KFZcunEnmSUoYp5CXibxtA==}
     engines: {node: '>= 0.4'}
 
-  oidc-client-ts@3.2.0:
-    resolution: {integrity: sha512-wUvVcG3SXzZDKHxi/VGQGaTUk9qguMKfYh26Y1zOVrQsu1zp85JWx/SjZzKSXK5j3NA1RcasgMoaHe6gt1WNtw==}
+  oidc-client-ts@3.2.1:
+    resolution: {integrity: sha512-hS5AJ5s/x4bXhHvNJT1v+GGvzHUwdRWqNQQbSrp10L1IRmzfRGKQ3VWN3dstJb+oF3WtAyKezwD2+dTEIyBiAA==}
     engines: {node: '>=18'}
 
   optionator@0.9.4:
@@ -3478,7 +3481,7 @@ snapshots:
       define-properties: 1.2.1
       es-object-atoms: 1.1.1
 
-  oidc-client-ts@3.2.0:
+  oidc-client-ts@3.2.1:
     dependencies:
       jwt-decode: 4.0.0
 
@@ -3563,9 +3566,9 @@ snapshots:
 
   react-is@19.0.0: {}
 
-  react-oidc-context@3.2.0(oidc-client-ts@3.2.0)(react@19.0.0):
+  react-oidc-context@3.2.0(oidc-client-ts@3.2.1)(react@19.0.0):
     dependencies:
-      oidc-client-ts: 3.2.0
+      oidc-client-ts: 3.2.1
       react: 19.0.0
 
   react-redux@9.2.0(@types/react@19.0.10)(react@19.0.0)(redux@5.0.1):

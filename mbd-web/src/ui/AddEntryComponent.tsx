@@ -16,6 +16,8 @@ import {
   clearSaveError,
   selectSaving,
   selectSaveError,
+  selectEditing,
+  selectSelectedMeal,
 } from "@/lib/features/meals/mealsSlice";
 import {
   selectError as selectFoodsError,
@@ -23,6 +25,7 @@ import {
 } from "@/lib/features/foods/foodsSlice";
 import { AddMealComponent } from "./AddMealComponent";
 import { AddSymptomComponent } from "./AddSymptomComponent";
+import { ReviseMealComponent } from "./ReviseMealComponent";
 
 export const AddEntryComponent = () => {
   const dispatch = useAppDispatch();
@@ -30,6 +33,8 @@ export const AddEntryComponent = () => {
   const saving = useAppSelector(selectSaving);
   const saveError = useAppSelector(selectSaveError);
   const foodsError = useAppSelector(selectFoodsError);
+  const isEditing = useAppSelector(selectEditing);
+  const selectedMeal = useAppSelector(selectSelectedMeal);
 
   const [selectedOption, setSelectedOption] = useState("meal");
   const [expanded, setExpanded] = useState(true);
@@ -51,9 +56,11 @@ export const AddEntryComponent = () => {
         <Typography>
           {!expanded
             ? "Add a Meal or Symptom"
-            : selectedOption === "meal"
-              ? "Add a Meal"
-              : "Add a Symptom"}
+            : isEditing
+              ? "Revising Meal"
+              : selectedOption === "meal"
+                ? "Add a Meal"
+                : "Add a Symptom"}
         </Typography>
       </AccordionSummary>
       <AccordionDetails>
@@ -72,27 +79,33 @@ export const AddEntryComponent = () => {
               {saveError || foodsError}
             </Alert>
           )}
-          <Box sx={{ display: "flex", justifyContent: "space-between" }}>
-            <Button
-              variant={selectedOption === "meal" ? "contained" : "outlined"}
-              startIcon={<RestaurantIcon />}
-              onClick={() => handleOptionChange("meal")}
-              sx={{ flexGrow: 1, mr: 1 }}
-              disabled={saving}
-            >
-              Meal
-            </Button>
-            <Button
-              variant={selectedOption === "symptom" ? "contained" : "outlined"}
-              startIcon={<HealingIcon />}
-              onClick={() => handleOptionChange("symptom")}
-              sx={{ flexGrow: 1, ml: 1 }}
-              disabled={saving}
-            >
-              Symptom
-            </Button>
-          </Box>
-          {selectedOption === "meal" ? (
+          {!isEditing && (
+            <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+              <Button
+                variant={selectedOption === "meal" ? "contained" : "outlined"}
+                startIcon={<RestaurantIcon />}
+                onClick={() => handleOptionChange("meal")}
+                sx={{ flexGrow: 1, mr: 1 }}
+                disabled={saving}
+              >
+                Meal
+              </Button>
+              <Button
+                variant={
+                  selectedOption === "symptom" ? "contained" : "outlined"
+                }
+                startIcon={<HealingIcon />}
+                onClick={() => handleOptionChange("symptom")}
+                sx={{ flexGrow: 1, ml: 1 }}
+                disabled={saving}
+              >
+                Symptom
+              </Button>
+            </Box>
+          )}
+          {isEditing ? (
+            <ReviseMealComponent originalMeal={selectedMeal!} />
+          ) : selectedOption === "meal" ? (
             <AddMealComponent />
           ) : (
             <AddSymptomComponent />

@@ -7,11 +7,17 @@ export const FormControls = ({
   saving,
   onSave,
   onClear,
+  saveLabel = "Save",
+  clearLabel = "Clear",
+  color = "primary",
 }: {
   disabled?: boolean;
   saving: boolean;
   onSave: () => void;
   onClear: () => void;
+  saveLabel?: string;
+  clearLabel?: string;
+  color?: "primary" | "secondary" | "error" | "info" | "success" | "warning";
 }) => {
   return (
     <Box sx={{ display: "flex", justifyContent: "space-between" }}>
@@ -22,11 +28,11 @@ export const FormControls = ({
         onClick={onClear}
         disabled={saving}
       >
-        Clear
+        {clearLabel}
       </Button>
       <Button
         variant="contained"
-        color="primary"
+        color={color}
         startIcon={saving ? <CircularProgress size={20} /> : <SaveIcon />}
         onClick={onSave}
         disabled={
@@ -37,7 +43,7 @@ export const FormControls = ({
           //   mergedSelectedItems.filter((f) => f.selected).length === 0
         }
       >
-        {saving ? "Saving..." : "Save"}
+        {saving ? "Saving..." : saveLabel}
       </Button>
     </Box>
   );

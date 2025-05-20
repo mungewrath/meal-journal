@@ -2,6 +2,7 @@ import { createAppSlice } from "@/lib/createAppSlice";
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { fetchMealsApi, FetchMealsParams } from "@/lib/api/fetchMeals";
 import { saveMealApi, SaveMealParams } from "@/lib/api/saveMeal";
+import { updateMealApi, UpdateMealParams } from "@/lib/api/updateMeal";
 import { Meal } from "./models";
 import { ApiMeal } from "@/lib/api/contracts";
 import { convertFromApiDate } from "@/lib/utils/dateUtils";
@@ -20,6 +21,13 @@ export const saveMeal = createAsyncThunk(
   }
 );
 
+export const updateMeal = createAsyncThunk(
+  "meals/updateMeal",
+  async (params: UpdateMealParams) => {
+    return updateMealApi(params);
+  }
+);
+
 interface MealsSliceState {
   meals: MealState[];
   loading: boolean;
@@ -27,6 +35,8 @@ interface MealsSliceState {
   saving: boolean;
   saveError: string | null;
   loadError: string | null;
+  selectedMealId: string | null;
+  editing: boolean;
 }
 
 export interface MealState {
@@ -85,6 +95,8 @@ const initialState: MealsSliceState = {
   saving: false,
   saveError: null,
   loadError: null,
+  selectedMealId: null,
+  editing: false,
 };
 
 export const mealsSlice = createAppSlice({
@@ -93,40 +105,109 @@ export const mealsSlice = createAppSlice({
   reducers: (create) => ({
     clearSaveError: create.reducer((state) => {
       state.saveError = null;
+      return state;
     }),
     clearLoadError: create.reducer((state) => {
       state.loadError = null;
+      return state;
+    }),
+    selectMeal: create.reducer<string>((state, action) => {
+      state.selectedMealId = action.payload;
+      return state;
+    }),
+    startEditing: create.reducer((state) => {
+      state.editing = true;
+      return state;
+    }),
+    cancelEditing: create.reducer((state) => {
+      state.editing = false;
+      state.selectedMealId = null;
+      return state;
     }),
   }),
   extraReducers: (builder) => {
     builder
       .addCase(fetchMeals.pending, (state) => {
         state.loading = true;
+        return state;
       })
       .addCase(fetchMeals.fulfilled, (state, action) => {
         state.loading = false;
         state.meals = [...state.meals, ...action.payload];
         state.daysLoaded += action.meta.arg.days;
+        return state;
       })
       .addCase(fetchMeals.rejected, (state, action) => {
         state.loading = false;
-        state.loadError =
-          `Failed to fetch meals: ${action.error?.message}` ||
-          "Failed to fetch meals";
+        state.loadError = action.error?.message
+          ? `Failed to fetch meals: ${action.error.message}`
+          : "Failed to fetch meals";
+        return state;
       })
       .addCase(saveMeal.pending, (state) => {
         state.saving = true;
         state.saveError = null;
+        return state;
       })
       .addCase(saveMeal.fulfilled, (state, action) => {
         state.saving = false;
         state.meals = [mealFromApi(action.payload), ...state.meals];
+        return state;
       })
       .addCase(saveMeal.rejected, (state, action) => {
         state.saving = false;
-        state.saveError =
-          `Failed to save meal: ${action.error?.message}` ||
-          "Failed to save meal";
+        state.saveError = action.error?.message
+          ? `Failed to save meal: ${action.error.message}`
+          : "Failed to save meal";
+        return state;
+      })
+      .addCase(updateMeal.pending, (state) => {
+        state.saving = true;
+        state.saveError = null;
+        return state;
+      })
+      .addCase(updateMeal.fulfilled, (state, action) => {
+        // TODO: Need to remove the old meal from the state if the ID changed
+        state.saving = false;
+        state.editing = false;
+        state.selectedMealId = null;
+
+        // Find and replace the updated meal
+        const updatedMeal = mealFromApi(action.payload);
+        const index = state.meals.findIndex(
+          (meal) => meal.id === updatedMeal.id
+        );
+
+        if (index !== -1) {
+          state.meals[index] = updatedMeal;
+        } else {
+          // If the meal ID changed (due to date/time change), remove the old one and add the new one
+          const originalDateTime = action.meta.arg.originalDateTime;
+          const mealTypeFromId = updatedMeal.id.split("-")[0];
+          const oldMealId = `${mealTypeFromId}-${originalDateTime}`;
+
+          const oldIndex = state.meals.findIndex(
+            (meal) => meal.id === oldMealId
+          );
+          if (oldIndex !== -1) {
+            state.meals.splice(oldIndex, 1);
+          }
+
+          state.meals.push(updatedMeal);
+          // Sort meals by date (newest first)
+          state.meals.sort(
+            (a, b) =>
+              new Date(b.dateTime).getTime() - new Date(a.dateTime).getTime()
+          );
+        }
+        return state;
+      })
+      .addCase(updateMeal.rejected, (state, action) => {
+        state.saving = false;
+        state.saveError = action.error?.message
+          ? `Failed to update meal: ${action.error.message}`
+          : "Failed to update meal";
+        return state;
       });
   },
   selectors: {
@@ -137,6 +218,13 @@ export const mealsSlice = createAppSlice({
     selectSaving: (state: MealsSliceState) => state.saving,
     selectSaveError: (state: MealsSliceState) => state.saveError,
     selectLoadError: (state: MealsSliceState) => state.loadError,
+    selectSelectedMealId: (state: MealsSliceState) => state.selectedMealId,
+    selectEditing: (state: MealsSliceState) => state.editing,
+    selectSelectedMeal: (state: MealsSliceState) => {
+      if (!state.selectedMealId) return null;
+      const meal = state.meals.find((m) => m.id === state.selectedMealId);
+      return meal ? mealToDomain(meal) : null;
+    },
   },
 });
 
@@ -147,6 +235,15 @@ export const {
   selectSaving,
   selectSaveError,
   selectLoadError,
+  selectSelectedMealId,
+  selectEditing,
+  selectSelectedMeal,
 } = mealsSlice.selectors;
 
-export const { clearSaveError, clearLoadError } = mealsSlice.actions;
+export const {
+  clearSaveError,
+  clearLoadError,
+  selectMeal,
+  startEditing,
+  cancelEditing,
+} = mealsSlice.actions;

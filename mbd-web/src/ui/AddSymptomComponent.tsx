@@ -28,12 +28,7 @@ export const AddSymptomComponent = ({}) => {
   const saveError = useAppSelector(selectSaveError);
 
   useEffect(() => {
-    // Set the default date to today's date in Pacific Time
-    const today = new Date();
-    const pacificOffset = -7 * 60; // Pacific Time is UTC-7
-    const pacificDate = new Date(today.getTime() + pacificOffset * 60 * 1000);
-    const formattedDate = pacificDate.toISOString().split("T")[0];
-    setDate(formattedDate);
+    setTodaysDate();
   }, []);
 
   const handleDateChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -44,8 +39,17 @@ export const AddSymptomComponent = ({}) => {
     setTime(event.target.value);
   };
 
+  const setTodaysDate = () => {
+    // Set the default date to today's date in Pacific Time
+    const today = new Date();
+    const pacificOffset = -7 * 60; // Pacific Time is UTC-7
+    const pacificDate = new Date(today.getTime() + pacificOffset * 60 * 1000);
+    const formattedDate = pacificDate.toISOString().split("T")[0];
+    setDate(formattedDate);
+  }
+
   const handleClear = () => {
-    setDate(new Date().toISOString().split("T")[0]);
+    setTodaysDate();
     setTime("");
     setSelectedItems([]);
   };

@@ -167,16 +167,15 @@ export const mealsSlice = createAppSlice({
         return state;
       })
       .addCase(updateMeal.fulfilled, (state, action) => {
-        // TODO: Need to remove the old meal from the state if the ID changed
-        state.saving = false;
-        state.editing = false;
-        state.selectedMealId = null;
-
         // Find and replace the updated meal
         const updatedMeal = mealFromApi(action.payload);
         const index = state.meals.findIndex(
           (meal) => meal.id === updatedMeal.id
         );
+
+        console.log("Updating meal with ID:", updatedMeal.id);
+        console.log("Original date/time:", action.meta.arg.originalDateTime);
+        console.log("Index of existing meal:", index);
 
         if (index !== -1) {
           state.meals[index] = updatedMeal;
@@ -184,13 +183,15 @@ export const mealsSlice = createAppSlice({
           // If the meal ID changed (due to date/time change), remove the old one and add the new one
           const originalDateTime = action.meta.arg.originalDateTime;
           const mealTypeFromId = updatedMeal.id.split("-")[0];
-          const oldMealId = `${mealTypeFromId}-${originalDateTime}`;
 
           const oldIndex = state.meals.findIndex(
-            (meal) => meal.id === oldMealId
+            (meal) => meal.id === state.selectedMealId
           );
           if (oldIndex !== -1) {
+            console.log("Removing old meal with ID:", state.selectedMealId);
             state.meals.splice(oldIndex, 1);
+          } else {
+            console.log("Old meal not found for ID:", state.selectedMealId);
           }
 
           state.meals.push(updatedMeal);
@@ -200,6 +201,11 @@ export const mealsSlice = createAppSlice({
               new Date(b.dateTime).getTime() - new Date(a.dateTime).getTime()
           );
         }
+
+        state.saving = false;
+        state.editing = false;
+        state.selectedMealId = null;
+
         return state;
       })
       .addCase(updateMeal.rejected, (state, action) => {

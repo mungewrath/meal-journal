@@ -50,6 +50,7 @@ export const ReviseMealComponent = ({
   const [selectedItems, setSelectedItems] = useState<Item[]>([]);
   const [entryName, setEntryName] = useState("");
   const [originalDateTime, setOriginalDateTime] = useState("");
+  const [prepopulated, setPrepopulated] = useState(false);
 
   const saving = useAppSelector(selectMealSaving);
   // const saveError = useAppSelector(selectSaveError);
@@ -57,9 +58,8 @@ export const ReviseMealComponent = ({
   const suggestedFoods = useAppSelector(selectSuggestedFoods);
 
   // Initialize form with selected meal data
-  // TODO: Need to memoize or save original date once to avoid resetting
   useEffect(() => {
-    if (originalMeal) {
+    if (originalMeal && !prepopulated) {
       const dateObj = originalMeal.dateTime;
       const formattedDate = dateObj.toISOString().split("T")[0];
       const formattedTime = dateObj.toTimeString().substring(0, 5);
@@ -79,6 +79,7 @@ export const ReviseMealComponent = ({
       }));
 
       setSelectedItems(items);
+      setPrepopulated(true);
     }
   }, [originalMeal]);
 
@@ -171,7 +172,6 @@ export const ReviseMealComponent = ({
       />
       <FormControl>
         <InputLabel>Meal Name</InputLabel>
-        {/* TODO: This gets auto-reset to the original meal type */}
         <Select
           value={entryName}
           onChange={handleEntryNameChange}

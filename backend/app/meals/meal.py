@@ -8,7 +8,7 @@ from pynamodb.connection import Connection
 from botocore.exceptions import ClientError
 
 from foods.food import MbdFood
-from packages.pynamodb.transactions import TransactWrite
+from pynamodb.transactions import TransactWrite
 from shared.exceptions import MbdException
 
 

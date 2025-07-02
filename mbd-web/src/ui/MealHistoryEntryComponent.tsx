@@ -7,15 +7,22 @@ import {
   selectMeal,
   startEditing,
   selectSelectedMealId,
+  selectSaving,
+  selectEditing,
 } from "@/lib/features/meals/mealsSlice";
 
 export const MealHistoryEntryComponent = ({ meal }: { meal: Meal }) => {
   const dispatch = useAppDispatch();
+
+  const mealSaving = useAppSelector(selectSaving);
+  const editing = useAppSelector(selectEditing);
   const selectedMealId = useAppSelector(selectSelectedMealId);
   const isSelected = selectedMealId === meal.id;
 
   const handleSelectMeal = () => {
-    dispatch(selectMeal(meal.id));
+    if (!mealSaving && !editing) {
+      dispatch(selectMeal(meal.id));
+    }
   };
 
   const handleEditMeal = () => {
@@ -72,6 +79,7 @@ export const MealHistoryEntryComponent = ({ meal }: { meal: Meal }) => {
             color="primary"
             // sx={{ position: "absolute", top: 8, right: 8 }}
 
+            disabled={mealSaving}
             onClick={handleEditMeal}
             aria-label="Edit meal"
           >

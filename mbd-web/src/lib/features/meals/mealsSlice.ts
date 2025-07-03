@@ -181,9 +181,6 @@ export const mealsSlice = createAppSlice({
           state.meals[index] = updatedMeal;
         } else {
           // If the meal ID changed (due to date/time change), remove the old one and add the new one
-          const originalDateTime = action.meta.arg.originalDateTime;
-          const mealTypeFromId = updatedMeal.id.split("-")[0];
-
           const oldIndex = state.meals.findIndex(
             (meal) => meal.id === state.selectedMealId
           );

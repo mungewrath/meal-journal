@@ -81,7 +81,7 @@ export const ReviseMealComponent = ({
       setSelectedItems(items);
       setPrepopulated(true);
     }
-  }, [originalMeal]);
+  }, [originalMeal, prepopulated]);
 
   useEffect(() => {
     if (entryName && auth.user?.id_token) {

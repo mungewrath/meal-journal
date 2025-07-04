@@ -50,18 +50,25 @@ export const AddEntryComponent = () => {
     setExpanded(isExpanded);
   };
 
+  const topLabel = () => {
+    if (!expanded) {
+      return "Add a Meal or Symptom";
+    }
+    if (isEditing) {
+      return "Revising Meal";
+    } else {
+      return selectedOption === "meal" ? "Add a Meal" : "Add a Symptom";
+    }
+  }
+
   return (
     <Accordion expanded={expanded} onChange={handleAccordionChange}>
       <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-        <Typography>
-          {!expanded
-            ? "Add a Meal or Symptom"
-            : isEditing
-              ? "Revising Meal"
-              : selectedOption === "meal"
-                ? "Add a Meal"
-                : "Add a Symptom"}
-        </Typography>
+        {!isEditing && (
+          <Typography>
+            {topLabel()}
+          </Typography>
+        )}
       </AccordionSummary>
       <AccordionDetails>
         <Box

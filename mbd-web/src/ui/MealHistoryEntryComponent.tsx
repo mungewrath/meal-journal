@@ -77,8 +77,6 @@ export const MealHistoryEntryComponent = ({ meal }: { meal: Meal }) => {
         >
           <Button
             color="primary"
-            // sx={{ position: "absolute", top: 8, right: 8 }}
-
             disabled={mealSaving}
             onClick={handleEditMeal}
             aria-label="Edit meal"

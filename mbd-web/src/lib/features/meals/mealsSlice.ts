@@ -105,66 +105,54 @@ export const mealsSlice = createAppSlice({
   reducers: (create) => ({
     clearSaveError: create.reducer((state) => {
       state.saveError = null;
-      return state;
     }),
     clearLoadError: create.reducer((state) => {
       state.loadError = null;
-      return state;
     }),
     selectMeal: create.reducer<string>((state, action) => {
       state.selectedMealId = action.payload;
-      return state;
     }),
     startEditing: create.reducer((state) => {
       state.editing = true;
-      return state;
     }),
     cancelEditing: create.reducer((state) => {
       state.editing = false;
       state.selectedMealId = null;
-      return state;
     }),
   }),
   extraReducers: (builder) => {
     builder
       .addCase(fetchMeals.pending, (state) => {
         state.loading = true;
-        return state;
       })
       .addCase(fetchMeals.fulfilled, (state, action) => {
         state.loading = false;
         state.meals = [...state.meals, ...action.payload];
         state.daysLoaded += action.meta.arg.days;
-        return state;
       })
       .addCase(fetchMeals.rejected, (state, action) => {
         state.loading = false;
         state.loadError = action.error?.message
           ? `Failed to fetch meals: ${action.error.message}`
           : "Failed to fetch meals";
-        return state;
       })
       .addCase(saveMeal.pending, (state) => {
         state.saving = true;
         state.saveError = null;
-        return state;
       })
       .addCase(saveMeal.fulfilled, (state, action) => {
         state.saving = false;
         state.meals = [mealFromApi(action.payload), ...state.meals];
-        return state;
       })
       .addCase(saveMeal.rejected, (state, action) => {
         state.saving = false;
         state.saveError = action.error?.message
           ? `Failed to save meal: ${action.error.message}`
           : "Failed to save meal";
-        return state;
       })
       .addCase(updateMeal.pending, (state) => {
         state.saving = true;
         state.saveError = null;
-        return state;
       })
       .addCase(updateMeal.fulfilled, (state, action) => {
         // Find and replace the updated meal
@@ -172,10 +160,6 @@ export const mealsSlice = createAppSlice({
         const index = state.meals.findIndex(
           (meal) => meal.id === updatedMeal.id
         );
-
-        console.log("Updating meal with ID:", updatedMeal.id);
-        console.log("Original date/time:", action.meta.arg.originalDateTime);
-        console.log("Index of existing meal:", index);
 
         if (index !== -1) {
           state.meals[index] = updatedMeal;
@@ -202,15 +186,12 @@ export const mealsSlice = createAppSlice({
         state.saving = false;
         state.editing = false;
         state.selectedMealId = null;
-
-        return state;
       })
       .addCase(updateMeal.rejected, (state, action) => {
         state.saving = false;
         state.saveError = action.error?.message
           ? `Failed to update meal: ${action.error.message}`
           : "Failed to update meal";
-        return state;
       });
   },
   selectors: {

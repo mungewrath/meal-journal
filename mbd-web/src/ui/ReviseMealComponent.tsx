@@ -43,8 +43,6 @@ export const ReviseMealComponent = ({
   const dispatch = useAppDispatch();
   const auth = useAuth();
 
-  // const selectedMeal = useAppSelector(selectSelectedMeal);
-
   const [date, setDate] = useState("");
   const [time, setTime] = useState("");
   const [selectedItems, setSelectedItems] = useState<Item[]>([]);
@@ -53,7 +51,6 @@ export const ReviseMealComponent = ({
   const [prepopulated, setPrepopulated] = useState(false);
 
   const saving = useAppSelector(selectMealSaving);
-  // const saveError = useAppSelector(selectSaveError);
   const foodsLoading = useAppSelector(selectFoodsLoading);
   const suggestedFoods = useAppSelector(selectSuggestedFoods);
 
@@ -158,7 +155,7 @@ export const ReviseMealComponent = ({
 
   return (
     <>
-      <Typography variant="h6" color="primary" sx={{ mb: 2 }}>
+      <Typography variant="h6" color="secondary" sx={{ mb: 2 }}>
         Revising meal from{" "}
         {originalMeal ? formatDate(originalMeal.dateTime) : ""}
       </Typography>

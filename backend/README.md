@@ -1,8 +1,9 @@
 # Meal Journal backend
 
 ## Backend prerequisites
-- `uv sync` - Installs packages
-- `uv lock` - Updates uv.lock file for consistent dependencies
+- [uv](https://docs.astral.sh/uv/getting-started/installation/)
+    - `uv sync` - Installs packages
+    - `uv lock` - Updates uv.lock file for consistent dependencies
 - [AWS CLI](https://docs.aws.amazon.com/cli/latest/userguide/getting-started-install.html) for local debugging
 - Access keys an an AWS_PROFILE configured in the CLI for each environment:
     - Stage: AWS profile should be named `mealjournal-stage`
@@ -37,7 +38,8 @@ Tests are located in the `tests/` directory. Follow these guidelines when writin
 ## Debugging Backend
 You should be able to use VS Code to debug with breakpoints.
 1. Ensure your console session has access to the environment you're debugging
-  1. An easy way to do this is `export AWS_PROFILE=mbd-stage`, if you have access keys configured with that profile name
+    1. For stage, configure the AWS CLI with a set of access keys for a profile named `mealjournal-stage`
+    1. For prod, configure the AWS CLI with a set of access keys for a profile named `mealjournal-prod`
 1. Hit debug in VS Code
 
 To run locally, you need the AWS CLI configured so DynamoDB can be accessed.

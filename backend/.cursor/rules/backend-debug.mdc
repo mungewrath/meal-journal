@@ -1,0 +1,10 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+
+# Your rule content
+
+- Debug the backend service by invoking `cd /Users/mattunrath/ParDev/src/meal-journal/backend/app && PYTHONPATH=. AWS_PROFILE=mealjournal-stage ENVIRONMENT=dev uv run fastapi dev`
+- Requests to the backend must have an Authorization Bearer header; a sample is available in [auth.sample](mdc:Backend/Backend/Backend/auth.sample)

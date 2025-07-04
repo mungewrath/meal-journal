@@ -72,17 +72,17 @@ resource "aws_api_gateway_method_response" "proxy_options" {
     "method.response.header.Access-Control-Allow-Headers" = true
   }
 }
-# Integration response for mock integration
+# Integration response for CORS
 resource "aws_api_gateway_integration_response" "options" {
   rest_api_id = aws_api_gateway_rest_api.mbd_rest_api.id
   resource_id = aws_api_gateway_resource.proxy.id
   http_method = aws_api_gateway_method.proxy_options.http_method
   status_code = "200"
 
-  # Set the appropriate CORS headers in the mock response
+  # Set the appropriate CORS headers
   response_parameters = {
     "method.response.header.Access-Control-Allow-Origin"  = "'*'"
-    "method.response.header.Access-Control-Allow-Methods" = "'GET,POST,OPTIONS'"
+    "method.response.header.Access-Control-Allow-Methods" = "'GET,POST,PUT,DELETE,OPTIONS'"
     "method.response.header.Access-Control-Allow-Headers" = "'Content-Type,Authorization'"
   }
 }

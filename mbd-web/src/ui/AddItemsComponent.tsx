@@ -130,26 +130,25 @@ export const AddItemsComponent = ({
   };
 
   // Filter out already selected items from options
-  const getFilteredOptions = () => {
+  const getUnselectedOptions = () => {
     const selectedIds = new Set(items.map((item) => item.id));
     return placeholderItems[type].filter((item) => !selectedIds.has(item.id));
   };
 
   const handleKeyDown = (event: React.KeyboardEvent) => {
     if (event.key === "Enter") {
+      console.log("Enter key pressed, inputValue:", inputValue);
       event.preventDefault();
-      // Get the current filtered options
-      const options = getFilteredOptions();
-      const filtered = filter(options, {
+      const filtered = filter(getUnselectedOptions(), {
         inputValue,
         getOptionLabel: (option) => option.name,
       });
 
       // If there are any options, select the first one
       if (filtered.length > 0) {
-        const option = filtered[0];
-        if (!items.some((item) => item.id === option.id)) {
-          onChange([...items, option]);
+        const firstOption = filtered[0];
+        if (!items.some((item) => item.id === firstOption.id)) {
+          onChange([...items, firstOption]);
           setInputValue("");
           setOpen(false);
         }
@@ -160,6 +159,7 @@ export const AddItemsComponent = ({
   return (
     <Box sx={{ display: "flex", flexDirection: "column", gap: 1 }}>
       <Autocomplete
+        noOptionsText="Already added or suggested"
         open={open}
         onOpen={() => setOpen(true)}
         onClose={() => setOpen(false)}
@@ -174,7 +174,7 @@ export const AddItemsComponent = ({
         onInputChange={(_, newInputValue) => {
           setInputValue(newInputValue);
         }}
-        options={getFilteredOptions()}
+        options={getUnselectedOptions()}
         getOptionLabel={(option) => {
           if (option.isNew) {
             return `Add "${option.name}"`;
@@ -185,19 +185,21 @@ export const AddItemsComponent = ({
           const filtered = filter(options, params);
 
           const { inputValue } = params;
+          const trimmmedInput = inputValue.trim();
           // Check if the input matches any existing item (case insensitive)
           const isExisting = options.some(
-            (option) => option.name.toLowerCase() === inputValue.toLowerCase()
+            (option) => option.name.toLowerCase() === trimmmedInput.toLowerCase()
           );
           // Check if the input matches any selected item (case insensitive)
           const isSelected = items.some(
-            (item) => item.name.toLowerCase() === inputValue.toLowerCase()
+            (item) => item.name.toLowerCase() === trimmmedInput.toLowerCase()
+            // && item.selected // TODO: This allows it to be selected, but duplicates the suggested chip
           );
 
           // Only suggest creating a new value if it doesn't match any existing or selected item
-          if (inputValue !== "" && !isExisting && !isSelected) {
+          if (trimmmedInput !== "" && !isExisting && !isSelected) {
             filtered.push({
-              name: inputValue,
+              name: trimmmedInput,
               id: crypto.randomUUID(),
               isNew: true,
               suggested: false,
@@ -211,7 +213,6 @@ export const AddItemsComponent = ({
         clearOnBlur
         handleHomeEndKeys
         autoComplete
-        autoSelect
         autoHighlight
         disableCloseOnSelect={false}
         renderOption={(props, option) => {

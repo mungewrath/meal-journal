@@ -8,7 +8,7 @@ const greetings = [
   "Something eating at you",
   "What's cooking",
   "Something got your tongue",
-  "Feeling chewed out",
+  "Chewed out",
   "Fed up"
 ]
 

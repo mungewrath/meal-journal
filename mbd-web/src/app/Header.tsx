@@ -1,9 +1,24 @@
 import { AppBar, Toolbar, IconButton, Typography, Button } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
 import { useAuth } from "react-oidc-context";
+import { useState } from "react";
+
+const greetings = [
+  "What's on your plate",
+  "Something eating at you",
+  "What's cooking",
+  "Something got your tongue",
+  "Chewed out",
+  "Fed up"
+]
 
 export const Header = () => {
   const auth = useAuth();
+
+  const [greeting] = useState(() => {
+    const randomIndex = Math.floor(Math.random() * greetings.length);
+    return greetings[randomIndex];
+  });
 
   const handleLogout = async () => {
     try {
@@ -47,7 +62,7 @@ export const Header = () => {
         {auth.isAuthenticated ? (
           <>
             <Typography sx={{ mr: 2 }}>
-              Oh hai, {auth.user?.profile["cognito:username"] as string}
+              {greeting}, {auth.user?.profile["cognito:username"] as string}?
             </Typography>
             <Button color="inherit" onClick={handleLogout}>
               Logout

@@ -15,7 +15,7 @@ const greetings = [
 export const Header = () => {
   const auth = useAuth();
 
-  const [greeting, setGreeting] = useState(() => {
+  const [greeting] = useState(() => {
     const randomIndex = Math.floor(Math.random() * greetings.length);
     return greetings[randomIndex];
   });
